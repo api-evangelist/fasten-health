@@ -93,9 +93,9 @@ apis:
     url: https://docs.connect.fastenhealth.com/api-reference/openapi.yaml
   - type: Authentication
     url: https://docs.connect.fastenhealth.com/api-reference/authentication
-  - type: Quickstart
+  - type: GettingStarted
     url: https://docs.connect.fastenhealth.com/quickstart
-  - type: SignUp
+  - type: Signup
     url: https://portal.connect.fastenhealth.com
     name: Fasten Connect Developer Portal
   - type: Sandbox
@@ -144,13 +144,13 @@ apis:
   properties:
   - type: Documentation
     url: https://docs.connect.fastenhealth.com/stitch/v4/introduction
-  - type: SDK
+  - type: SDKs
     url: https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/quickstart
     name: Stitch Web Component SDK
-  - type: SDK
+  - type: SDKs
     url: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/quickstart
     name: Stitch React SDK
-  - type: SDK
+  - type: SDKs
     url: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/quickstart
     name: Stitch React Native SDK
   - type: SourceCode
@@ -299,7 +299,7 @@ common:
   url: https://blog.fastenhealth.com
 - type: ChangeLog
   url: https://docs.connect.fastenhealth.com/changelog
-- type: SignUp
+- type: Signup
   url: https://portal.connect.fastenhealth.com
   name: Fasten Connect Developer Portal
 - type: Pricing
