@@ -286,6 +286,8 @@ apis:
     url: https://github.com/fastenhealth/fasten-answers-ai/blob/main/LICENSE
     name: GPL-3.0
 common:
+- type: DomainSecurity
+  url: security/fasten-health-domain-security.yml
 - type: Website
   url: https://www.fastenhealth.com
 - type: Documentation
