@@ -10,9 +10,20 @@ description: Fasten Health is a healthcare data interoperability company offerin
   the fragmentation of health data firsthand and based in New York City, Fasten ships GPL/MIT/Apache 2.0 open
   source repos alongside the hosted Fasten Connect platform.
 kind: contract
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source: []
+  generated: '2026-07-22'
+  method: derived
 position: Producing
 access: Open Source
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/fasten-health.png
 tags:
 - Healthcare
 - FHIR
