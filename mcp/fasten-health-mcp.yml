@@ -1,0 +1,146 @@
+generated: '2026-08-14'
+method: derived
+status: candidate
+source: openapi/fasten-health-connect-openapi-original.yml
+search_result: >-
+  No MCP server, hosted or local, is published by Fasten Health. Searched the documentation
+  (llms.txt indexes all 44 pages — none mention MCP), the A2A agent card served at
+  docs.connect.fastenhealth.com (advertises an Agent Skill, not an MCP endpoint), all 50 repos in
+  github.com/fastenhealth, and npm under @fastenhealth. The tools below are DERIVED from the
+  published OpenAPI as a candidate surface; they are not a Fasten product and no endpoint was
+  guessed or probed into existence.
+
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: derived
+  note: >-
+    Nobody ships a Fasten MCP server. `mode: none` means this file is an API Evangelist candidate
+    derivation, not an agent surface an integrator can reach. Fasten's real agent-facing surface is
+    the Agent Skill + agent card pair on the docs host (see skills/ and a2a/), which tells an agent
+    how to call the REST API directly rather than exposing tools.
+
+server:
+  name: fasten-connect
+  transport: null
+  url: null
+
+auth_model_if_built:
+  scheme: http-basic
+  credentials: API public ID + private key from https://portal.fastenhealth.com
+  caution: >-
+    The private key is all-or-nothing — there is no scope model — and the docs explicitly warn
+    against exposing it to client-side code. Any MCP server would need to hold a full-privilege
+    credential capable of requesting and downloading a patient's complete medical record.
+
+tool_count: 12
+tools:
+  - name: get_catalog_entry
+    description: Get branding and metadata for healthcare institutions supported by Fasten Connect.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/catalog
+    auth_required: false
+    action_class: read
+
+  - name: export_catalog
+    description: Retrieve pre-signed download links for the entire Fasten Connect catalog (brands, portals, endpoints).
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/catalog/export
+    auth_required: true
+    action_class: read
+
+  - name: search_catalog_brands
+    description: Search healthcare institutions supported by Fasten Connect.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#POST /bridge/catalog/search
+    auth_required: false
+    action_class: read
+
+  - name: get_organization
+    description: Get metadata about your organization, used for branding in the Stitch widget.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/org
+    auth_required: false
+    action_class: read
+
+  - name: get_org_connection
+    description: Check the status of an existing patient-to-organization connection.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/org_connection/{orgConnectionId}
+    auth_required: true
+    action_class: read
+
+  - name: revoke_vault_connection
+    description: Reset a TEFCA synthetic test patient's connections.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#POST /bridge/vault_connection/revoke
+    auth_required: true
+    action_class: write
+    caution: Destructive. Documented for synthetic test patients only.
+
+  - name: connect
+    description: Redirect a patient to their healthcare provider's portal to authenticate.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/connect
+    auth_required: false
+    action_class: browser-redirect
+    caution: >-
+      Returns 302 to a patient-facing portal. Not agent-invocable — this is a human consent flow
+      driven by the Stitch widget.
+
+  - name: reconnect
+    description: Re-authenticate an existing patient authorization with their provider's portal.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/reconnect
+    auth_required: false
+    action_class: browser-redirect
+    caution: Same as connect — a human consent flow, not an agent tool.
+
+  - name: create_ehi_export
+    description: Register a bulk Electronic Health Information export request for a patient connection.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#POST /bridge/fhir/ehi-export
+    auth_required: true
+    action_class: write
+    idempotent: true
+    idempotency_key: org_connection_id
+    caution: >-
+      Initiates retrieval of a patient's complete medical record. Consequence-bearing; should
+      require explicit purpose and be audited.
+
+  - name: get_ehi_export_status
+    description: Check the status and results of an EHI export task.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/fhir/ehi-export/{taskId}
+    auth_required: true
+    action_class: read
+
+  - name: download_ehi_export
+    description: Get a signed URL to download an EHI export result file.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#GET /bridge/fhir/ehi-export/{taskId}/download/{fileId}
+    auth_required: true
+    action_class: read
+    caution: >-
+      Returns PHI. Signed URL is valid for 10 minutes. Any agent handling this output is handling
+      protected health information.
+
+  - name: create_support_request
+    description: File a support ticket with the Fasten team.
+    source_operation: openapi/fasten-health-connect-openapi-original.yml#POST /support/request
+    auth_required: false
+    action_class: write
+
+derivation_notes:
+  - >-
+    Tool names were coined by API Evangelist from each operation's path, method and description.
+    The published OpenAPI 1.0.11 declares NO operationId on any of its 12 operations, so there is no
+    provider-assigned identifier to inherit.
+  - >-
+    Input schemas would come from each operation's parameters and requestBody in the spec. Because
+    the spec models no error responses, an MCP server built from it would have no defined failure
+    contract.
+  - >-
+    Two of the twelve operations (connect, reconnect) are 302 browser redirects into a patient
+    consent flow and are not meaningfully agent-invocable.
+  - >-
+    PHI handling dominates the risk profile here. See agentic-access/ for the per-operation
+    execution-contract classification.
+
+crosswalk: null
+crosswalk_note: >-
+  No mcp/fasten-health-tool-crosswalk.yml is emitted. The crosswalk binds a REAL published MCP tool
+  list (or GraphQL schema) to backing OpenAPI operations; Fasten publishes neither, so a crosswalk
+  would be a one-to-one restatement of this derived candidate list against itself.

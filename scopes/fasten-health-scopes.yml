@@ -1,0 +1,92 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity,
+  https://docs.connect.fastenhealth.com/webhooks/events
+docs: https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+note: >-
+  The Fasten Connect REST API itself is NOT OAuth-protected — it uses HTTP Basic auth with
+  public/private key pairs, and derive-oauth-scopes.py correctly found zero oauth2 security schemes
+  in the published OpenAPI. Two genuine OAuth scope surfaces exist alongside it, and both are
+  documented rather than specified: the OAuth 2.0 Pushed Authorization Request flow on Fasten's
+  identity service, and the SMART on FHIR scopes that the patient's own EHR grants and that Fasten
+  reports back on connection events. Neither appears in any machine-readable artifact.
+spec_derived: false
+spec_derived_note: >-
+  derive-oauth-scopes.py over openapi/fasten-health-connect-openapi-original.yml returned
+  "providers with oauth2: 0" — there is no oauth2 securityScheme to derive from.
+
+schemes:
+  - name: Fasten Identity (Pushed Authorization Request)
+    type: oauth2
+    source: docs
+    status: documented-host-unreachable
+    endpoint: POST https://identity.fastenhealth.com/oauth2/par
+    client_authentication: HTTP Basic with the Fasten public ID and private key
+    request_content_type: application/x-www-form-urlencoded
+    applies_to: Bring Your Own Identity (BYOI) TEFCA IAS flow
+    standards: [RFC 9126 Pushed Authorization Requests, RFC 8693 Token Exchange, RFC 7523, OpenID Connect Core 1.0]
+    parameters:
+      - {name: scope, required: true, value: "openid profile email", note: "Documented as a fixed value — must be exactly this."}
+      - {name: response_type, required: true, value: code}
+      - {name: prompt, required: true, value: consent}
+      - {name: redirect_uri, required: true, note: must exactly match a redirect URI registered for your Fasten client}
+      - {name: patient_id, required: true, note: your stable, opaque patient identifier}
+    response:
+      status: 201
+      fields: {request_uri: "urn:ietf:params:oauth:request_uri:<uuid>", expires_in: 90}
+      note: The request_uri is single-use and expires after 90 seconds.
+    jwks: https://identity.fastenhealth.com/jwks.json
+    probe:
+      checked: '2026-08-14'
+      result: >-
+        identity.fastenhealth.com does not resolve in public DNS (NXDOMAIN); no anonymous discovery
+        document could be fetched from it. Scopes below are taken from the documentation, not from
+        a live authorization-server metadata document.
+
+  - name: SMART on FHIR (granted by the patient's EHR)
+    type: oauth2
+    source: docs
+    applies_to: >-
+      The downstream authorization between the patient and their healthcare provider's EHR, brokered
+      by Fasten. Reported back to the integrator on the patient.connection_success webhook `scope`
+      field.
+    spec: https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html
+    note: >-
+      Only some EHRs report the granted scope; for those that do not, the field is omitted. In TEFCA
+      mode the scope is always present and always `patient/*.read`.
+
+scopes:
+  - scope: openid
+    description: Required OIDC scope for the Fasten Identity PAR request.
+    scheme: Fasten Identity (Pushed Authorization Request)
+    required: true
+    sources: [https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity]
+  - scope: profile
+    description: Required in the fixed `openid profile email` scope string for the PAR request.
+    scheme: Fasten Identity (Pushed Authorization Request)
+    required: true
+    sources: [https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity]
+  - scope: email
+    description: Required in the fixed `openid profile email` scope string for the PAR request.
+    scheme: Fasten Identity (Pushed Authorization Request)
+    required: true
+    sources: [https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity]
+  - scope: patient/*.read
+    description: >-
+      SMART on FHIR patient-level read scope. Always granted in TEFCA mode; required for a
+      successful EHI export.
+    scheme: SMART on FHIR (granted by the patient's EHR)
+    sources: [https://docs.connect.fastenhealth.com/webhooks/events]
+  - scope: patient/Patient.read
+    description: >-
+      SMART on FHIR demographics read scope. Named in the `scope_patient_missing` failure reason as
+      an acceptable alternative to patient/*.read; its absence (patient unchecked "Demographics"
+      during consent) causes EHI export to fail.
+    scheme: SMART on FHIR (granted by the patient's EHR)
+    sources: [https://docs.connect.fastenhealth.com/webhooks/events]
+
+gaps:
+  - No OAuth authorization-server metadata document is reachable (identity host does not resolve).
+  - No scopes or permissions reference page exists; scopes are scattered across guides.
+  - The Fasten Connect REST API has no per-scope authorization model — a private key is all-or-nothing.

@@ -1,0 +1,206 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://www.fastenhealth.com/,
+  https://docs.connect.fastenhealth.com/webhooks/verification,
+  https://docs.connect.fastenhealth.com/webhooks/events,
+  https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity,
+  https://docs.connect.fastenhealth.com/guides/tefca-ias,
+  openapi/fasten-health-connect-openapi-original.yml
+summary: >-
+  Fasten Health sits at the intersection of two standards stacks: US healthcare interoperability
+  (FHIR R4, SMART on FHIR, C-CDA, TEFCA IAS) and modern web-API security (Standard Webhooks, OAuth
+  2.0 token exchange and PAR, OIDC, NIST 800-63 identity assurance). Its own REST contract is the
+  least standards-aligned part of the stack: OpenAPI 3.0.1 with Basic auth, no RFC 9457, no
+  operationIds and no error responses.
+
+standards:
+  - id: openapi-3.0
+    conforms: true
+    evidence: >-
+      Published OpenAPI 3.0.1 document at
+      https://docs.connect.fastenhealth.com/api-reference/openapi.yaml (info.version 1.0.11,
+      12 operations, 8 component schemas).
+    note: >-
+      3.0.1 rather than 3.1.x. No operationId on any operation, and no 4xx/5xx responses declared,
+      so the document describes the happy path only.
+
+  - id: fhir-r4
+    conforms: true
+    evidence: >-
+      Bulk EHI exports are delivered as FHIR resources in NDJSON with content type
+      application/fhir+ndjson; webhook stats enumerate FHIR R4 resource types (AllergyIntolerance,
+      CarePlan, CareTeam, Condition, DiagnosticReport, DocumentReference, Encounter, Goal,
+      Immunization, Location, Medication, MedicationRequest, Observation, Organization, Patient,
+      Practitioner, Procedure, Binary). Fasten also publishes generated FHIR R4 Go models at
+      github.com/fastenhealth/gofhir-models (Apache-2.0).
+    note: >-
+      Fasten is a FHIR data CONSUMER and re-publisher, not a FHIR server — it exposes no FHIR REST
+      endpoints of its own and publishes no CapabilityStatement.
+
+  - id: fhir-bulk-data-ndjson
+    conforms: partial
+    evidence: >-
+      Export payloads are newline-delimited FHIR (application/fhir+ndjson), the FHIR Bulk Data
+      wire format, retrieved through a signed-URL download.
+    note: >-
+      The FHIR Bulk Data Access ($export / kick-off + polling + manifest) protocol itself is NOT
+      implemented; Fasten uses its own /bridge/fhir/ehi-export task API and webhook completion.
+
+  - id: smart-app-launch
+    conforms: partial
+    evidence: >-
+      Fasten brokers SMART on FHIR patient authorization with the patient's EHR and reports the
+      granted scope back on patient.connection_success, referencing
+      hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html. Scopes observed:
+      patient/*.read, patient/Patient.read.
+    note: >-
+      Conformance is on the EHR-facing side. Fasten's own API does not expose a SMART authorization
+      surface to its customers.
+
+  - id: ccda
+    conforms: true
+    evidence: >-
+      TEFCA API-mode testing selects deterministic C-CDA fixtures via fixtures.tefca_ccda
+      (myra-jones.xml, myra-jones-v2.xml, myra-jones-v7.xml, lennie-connell.xml,
+      bernice-maxwell.xml), which Fasten converts to FHIR resources.
+
+  - id: tefca-ias
+    conforms: true
+    evidence: >-
+      TEFCA Individual Access Services reached General Availability on 2026-01-03 with a dedicated
+      developer guide. Integrators onboard as TEFCA subparticipants under Fasten's QHIN; identity
+      proofing runs through approved CSPs (CLEAR, ID.me, Persona) and connections carry a
+      tefca_directory_id.
+    docs: https://docs.connect.fastenhealth.com/guides/tefca-ias
+
+  - id: nist-800-63-ial2-aal2
+    conforms: true
+    evidence: >-
+      The Bring Your Own Identity guide requires the integrator to authenticate the patient at AAL2
+      and to use a CSP capable of IAL2 identity proofing, citing NIST SP 800-63-4 Digital Identity
+      Guidelines, and requires an unexpired OIDC ID Token with the organization's HCID in `aud`.
+
+  - id: standard-webhooks
+    conforms: true
+    evidence: >-
+      "Fasten Connect webhooks conform to the Standard-Webhooks specification" — signature carried
+      in the Webhook-Signature header, with a signed timestamp for replay protection; any
+      Standard Webhooks library can verify.
+    spec: https://www.standardwebhooks.com/
+
+  - id: oauth2-token-exchange-rfc8693
+    conforms: true
+    evidence: >-
+      The BYOI Customer Token Exchange endpoint uses grant_type
+      urn:ietf:params:oauth:grant-type:token-exchange with subject_token_type jwt and
+      requested_token_type id_token; RFC 8693 is cited explicitly in the Standards section.
+
+  - id: oauth2-jwt-client-authentication-rfc7523
+    conforms: true
+    evidence: >-
+      Fasten signs a short-lived client assertion JWT (iss https://api.connect.fastenhealth.com,
+      sub = patient_id, aud = the registered token exchange endpoint, exp/iat/nbf/jti constraints,
+      JWKS key rotation with kid resolution). RFC 7523 is cited explicitly.
+
+  - id: oauth2-par-rfc9126
+    conforms: true
+    evidence: >-
+      POST https://identity.fastenhealth.com/oauth2/par returns 201 with a single-use request_uri
+      (urn:ietf:params:oauth:request_uri:<uuid>) that expires in 90 seconds.
+    note: >-
+      The identity host did not resolve in public DNS on 2026-08-14, so this is documented, not
+      independently observed.
+
+  - id: openid-connect-core
+    conforms: partial
+    evidence: >-
+      OIDC Core 1.0 is cited in the BYOI Standards section; the PAR request uses the fixed scope
+      "openid profile email" and CSP ID Tokens are validated for signature, issuer, expiration,
+      audience and CSP.
+    note: >-
+      No OIDC discovery document (/.well-known/openid-configuration) is reachable on any Fasten
+      host. portal.fastenhealth.com answers 200 with an SPA HTML shell, which is not a document.
+
+  - id: jti-replay-protection
+    conforms: true
+    evidence: >-
+      Client assertions carry a jti that must be present, unique and rejected if previously used;
+      integrators are told to cache accepted jti values until expiry.
+
+  - id: rfc3339-timestamps
+    conforms: true
+    evidence: consent_expires_at is documented as an RFC 3339 timestamp.
+
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      No application/problem+json anywhere. Responses use a proprietary ResponseWrapper envelope and
+      the OpenAPI declares no 4xx/5xx responses at all.
+
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: >-
+      Deprecations are announced in the dated changelog with a removal window, but no Sunset or
+      Deprecation HTTP header is documented or observed.
+
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: /.well-known/security.txt returns 404 on every Fasten host; api host returns 403.
+
+  - id: asyncapi
+    conforms: false
+    evidence: >-
+      A real 7-event webhook surface is documented, but no AsyncAPI document is published
+      (/asyncapi.yaml 404).
+
+  - id: a2a-1.0
+    conforms: partial
+    evidence: >-
+      An agent card is served at
+      https://docs.connect.fastenhealth.com/.well-known/agent-card.json. Graded near-conformant —
+      passes all hard checks, but declares supportedInterfaces where A2A 1.0.0 names the field
+      additionalInterfaces.
+    see: a2a/fasten-health-a2a.yml
+
+  - id: agent-skills
+    conforms: true
+    evidence: >-
+      A provider-authored Agent Skill is published at
+      /.well-known/agent-skills/fastenhealth/skill.md and referenced from the agent card.
+    see: skills/_index.yml
+
+  - id: llms-txt
+    conforms: true
+    evidence: >-
+      https://docs.connect.fastenhealth.com/llms.txt (7,801 bytes) indexes 44 documentation pages
+      plus the OpenAPI; every page is additionally served as markdown at a .md suffix.
+
+  - id: mcp
+    conforms: false
+    evidence: No MCP server is published or referenced in the docs, agent card or GitHub org.
+
+  - id: oauth2-api-authorization
+    conforms: false
+    evidence: >-
+      The Fasten Connect REST API uses HTTP Basic authentication with a public ID and private key,
+      not OAuth. There is no scoped authorization model for API consumers.
+
+compliance:
+  published: true
+  source: https://www.fastenhealth.com/
+  certifications:
+    - {name: SOC 2, claim: "SOC2 Certified", auditor_badge: Thoropass, evidence: "https://www.fastenhealth.com/images/logos/thoropass-soc2.png"}
+    - {name: HIPAA, claim: "HIPAA-compliant"}
+  commitments:
+    - {name: CARIN Alliance Code of Conduct, role: Signatory}
+    - {name: CMS Interoperability Framework, role: Pledged, source: "blogs/2025-07-31-fasten-health-pledges-to-cms-interoperability-framework.md"}
+  agreements:
+    - {name: Business Associate Agreement (BAA), availability: "customers on upgraded plans", source: "https://docs.connect.fastenhealth.com/support"}
+  trust_center: https://trust.fastenhealth.com/
+  see: security/fasten-health-trust-center.yml
+
+regulatory_context:
+  - {regime: HIPAA, relevance: Protected Health Information handled on behalf of covered entities and patients.}
+  - {regime: "21st Century Cures Act / ONC information blocking", relevance: "Fasten operates a patient-access surface and maintains github.com/fastenhealth/information-blocking-complaints (CC0-1.0)."}
+  - {regime: TEFCA, relevance: Operates Individual Access Services under a QHIN with subparticipant onboarding.}

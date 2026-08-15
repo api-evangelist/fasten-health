@@ -1,0 +1,175 @@
+generated: '2026-08-14'
+method: derived
+source: >-
+  openapi/fasten-health-connect-openapi-original.yml (8 component schemas, 12 operations),
+  enriched from https://docs.connect.fastenhealth.com/webhooks/events and
+  https://docs.connect.fastenhealth.com/guides/tefca-ias
+summary: >-
+  Fasten Connect's model is a three-layer graph. A CATALOG layer describes the US healthcare
+  provider landscape (Brand -> Portal -> Endpoint). A CONNECTION layer records one patient's
+  consented authorization to one of those endpoints, owned by the integrator's Organization. A TASK
+  layer moves clinical data: an EhiExportRequest fans out into downloadable FHIR bundles. Every
+  relationship is expressed as a bare id string — the spec contains ZERO inter-schema $ref links, so
+  the graph below is reconstructed from id-reference field names, not from spec structure.
+
+modelling_notes:
+  - >-
+    No schema references another schema. All eight component schemas are flat objects of scalars and
+    untyped arrays, so an integrator gets no traversable object graph from the contract.
+  - >-
+    Several first-class entities are never modelled as schemas at all — CatalogEndpoint, Patient,
+    Task results and every webhook payload exist only in prose documentation.
+  - >-
+    LighthouseCatalogSearchResults.hits is typed `object` with no inner structure, so catalog search
+    results are effectively untyped in the contract.
+  - >-
+    There are no documented id prefixes. Identifiers are bare UUIDv4 values, so an id carries no
+    type information — org_connection_id, endpoint_id, brand_id and portal_id are indistinguishable
+    by shape.
+
+entities:
+  - name: Organization
+    schema: ResponseWrapper-wrapped Organization
+    description: >-
+      The integrator's own account — the API customer, not a healthcare organization. Supplies the
+      branding shown to patients in the Stitch widget.
+    operations: [GET /bridge/org]
+    id_field: id
+    fields: [id, name, logo_uri, privacy_policy_uri, website_uri, plan, status]
+    note: >-
+      Carries a `plan` field, the only structured trace of Fasten's unpublished commercial tiers.
+
+  - name: OrganizationConnection
+    description: >-
+      The central entity. One patient's authorized connection between the integrator's Organization
+      and one healthcare endpoint. Everything downstream keys off org_connection_id, which the
+      integrator must persist.
+    operations: ["GET /bridge/org_connection/{orgConnectionId}", "GET /bridge/connect", "GET /bridge/reconnect"]
+    id_field: org_connection_id
+    fields:
+      - org_connection_id
+      - org_id
+      - catalog_brand_id
+      - catalog_portal_id
+      - catalog_endpoint_id
+      - tefca_directory_id
+      - platform_type
+      - api_mode
+      - status
+      - scope
+      - consent_expires_at
+    enums:
+      status: [authorized, revoked]
+      api_mode: [test, live]
+    note: >-
+      In TEFCA mode catalog_brand_id / catalog_portal_id / catalog_endpoint_id may all be absent and
+      tefca_directory_id identifies the health system instead.
+
+  - name: CatalogBrand
+    description: A healthcare institution brand — the patient-recognisable name and logo.
+    operations: [GET /bridge/catalog, POST /bridge/catalog/search, GET /bridge/catalog/export]
+    id_field: id
+    fields: [id, last_updated, name, brand_website, aliases, description, portal_ids, brand_ids]
+    note: >-
+      Carries both portal_ids and a self-referential brand_ids array, implying brands can nest or
+      alias to other brands. The spec does not describe the semantics of brand_ids.
+
+  - name: CatalogPortal
+    description: A patient portal operated by a brand; the surface a patient logs into.
+    operations: [GET /bridge/catalog, POST /bridge/catalog/search, GET /bridge/catalog/export]
+    id_field: id
+    fields: [id, last_updated, name, portal_website, description, endpoint_ids]
+
+  - name: CatalogEndpoint
+    description: >-
+      The concrete FHIR/EHR endpoint behind a portal. Referenced by CatalogPortal.endpoint_ids,
+      by OrganizationConnection.catalog_endpoint_id, and by the endpoint_id on connection webhooks.
+    operations: [GET /bridge/catalog/export]
+    id_field: endpoint_id
+    schema_defined: false
+    note: >-
+      Not modelled as a component schema despite being referenced by three other entities and
+      returned in the bulk catalog export. Documented only as "metadata about the endpoint (name,
+      description, endpoint url information)".
+
+  - name: EhiExportRequest
+    description: >-
+      An asynchronous bulk Electronic Health Information export task for one connection. Idempotent
+      on org_connection_id — re-registering returns the existing task.
+    operations:
+      - POST /bridge/fhir/ehi-export
+      - GET /bridge/fhir/ehi-export/{taskId}
+      - GET /bridge/fhir/ehi-export/{taskId}/download/{fileId}
+    id_field: task_id
+    schema: EhiExportRequestStatus
+    fields: [task_id, status]
+    request_options: [org_connection_id, "fixtures.tefca_ccda"]
+    note: >-
+      The status schema exposes only task_id and status. Result statistics and download links are
+      never returned in a typed response — they arrive on the patient.ehi_export_success webhook.
+
+  - name: ExportFile
+    description: >-
+      One downloadable artifact of a completed export — JSONL (NDJSON) of FHIR R4 resources by
+      default, retrieved through a 302 to a signed URL valid for 10 minutes.
+    id_field: fileId
+    schema_defined: false
+    fields: [url, export_type, content_type]
+    content_type: application/fhir+ndjson
+    retention: deleted from Fasten storage after 24 hours
+    note: Modelled only in webhook documentation (download_links[]), not in the OpenAPI.
+
+  - name: VaultConnection
+    description: >-
+      TEFCA synthetic-patient connection state, revocable in bulk to reset a test scenario.
+    operations: [POST /bridge/vault_connection/revoke]
+    schemas: [VaultConnectionOrgRevokeRequest, VaultConnectionOrgRevokeResponse]
+    request_fields: [email]
+    response_fields: [request_id, revoked]
+    scope: test mode / synthetic TEFCA patients only
+
+  - name: ResponseWrapper
+    kind: envelope
+    fields: [success, error]
+    description: Common success/error envelope wrapping documented responses.
+
+  - name: SupportRequest
+    operations: [POST /support/request]
+    schema_defined: false
+    description: A support ticket filed through the API.
+
+relationships:
+  - {from: Organization, to: OrganizationConnection, type: has_many, via: org_id}
+  - {from: OrganizationConnection, to: Organization, type: belongs_to, via: org_id}
+  - {from: OrganizationConnection, to: CatalogBrand, type: belongs_to, via: catalog_brand_id}
+  - {from: OrganizationConnection, to: CatalogPortal, type: belongs_to, via: catalog_portal_id}
+  - {from: OrganizationConnection, to: CatalogEndpoint, type: belongs_to, via: catalog_endpoint_id}
+  - {from: CatalogBrand, to: CatalogPortal, type: has_many, via: portal_ids}
+  - {from: CatalogBrand, to: CatalogBrand, type: has_many, via: brand_ids, note: self-referential; semantics undocumented}
+  - {from: CatalogPortal, to: CatalogEndpoint, type: has_many, via: endpoint_ids}
+  - {from: EhiExportRequest, to: OrganizationConnection, type: belongs_to, via: org_connection_id}
+  - {from: EhiExportRequest, to: ExportFile, type: has_many, via: download_links, note: delivered on the webhook, not in a typed response}
+  - {from: VaultConnection, to: OrganizationConnection, type: has_many, via: revoked, note: revoke returns the connection ids it cleared}
+
+identifiers:
+  format: UUIDv4
+  prefixes: none
+  keys_to_persist:
+    - {field: org_connection_id, reason: "Required for every later API call; the docs say you must store it."}
+    - {field: task_id, reason: Correlates export status, download and webhook events.}
+    - {field: external_id, reason: "Integrator-supplied opaque patient id, echoed back on events."}
+    - {field: request_id, reason: Correlation id for support tickets.}
+
+clinical_model:
+  standard: FHIR R4
+  delivery: NDJSON bundle, not a queryable API
+  resource_types_observed:
+    [AllergyIntolerance, Binary, CarePlan, CareTeam, Condition, DiagnosticReport, DocumentReference,
+     Encounter, Goal, Immunization, Location, Medication, MedicationRequest, Observation,
+     Organization, Patient, Practitioner, Procedure]
+  note: >-
+    Fasten does not model clinical data in its own API at all — the clinical model is FHIR, handed
+    over wholesale as a file. The Fasten data model is entirely about connection and consent
+    plumbing around that file.
+
+render: null

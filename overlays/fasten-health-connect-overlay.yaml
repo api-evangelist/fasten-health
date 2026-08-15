@@ -1,0 +1,141 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Fasten Connect
+  version: 1.0.0
+extends: openapi/fasten-health-connect-openapi-original.yml
+x-generated: '2026-08-14'
+x-method: generated
+x-source: >-
+  Derived from the harvested Fasten Connect OpenAPI 1.0.11 plus the artifacts in this repo
+  (conventions/, errors/, lifecycle/, sandbox/, asyncapi/, data-model/). Captures API Evangelist
+  annotations ONLY — the harvested spec at openapi/fasten-health-connect-openapi-original.yml is
+  never mutated.
+x-notes:
+  - >-
+    The upstream spec declares no operationId on any of its 12 operations. This overlay does NOT
+    invent operationIds — coining ids would create identifiers no Fasten client or document uses.
+    The gap is recorded instead.
+  - >-
+    The upstream spec declares no 4xx or 5xx response on any operation. This overlay does not add
+    error responses, because their shape is not published anywhere and inventing one would put a
+    fabricated contract in front of an agent.
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-slug: fasten-health
+      x-apievangelist-profile: https://apis.io/provider/fasten-health
+      x-apievangelist-reviewed: '2026-08-14'
+      x-spec-gaps:
+        operation_ids: 0 of 12 operations declare an operationId
+        error_responses: 0 of 12 operations declare a 4xx or 5xx response
+        schema_refs: 0 inter-schema $ref links across 8 component schemas
+      x-artifacts:
+        conventions: conventions/fasten-health-conventions.yml
+        authentication: authentication/fasten-health-authentication.yml
+        errors: errors/fasten-health-problem-types.yml
+        lifecycle: lifecycle/fasten-health-lifecycle.yml
+        sandbox: sandbox/fasten-health-sandbox.yml
+        webhooks: asyncapi/fasten-health-webhooks.yml
+        data_model: data-model/fasten-health-data-model.yml
+        agent_skill: skills/fasten-health-fastenhealth-skill.md
+        agent_card: a2a/fasten-health-a2a.yml
+
+  - target: $.info
+    update:
+      x-agent-readiness:
+        agent_card: near-conformant
+        agent_skill: provider-published
+        llms_txt: true
+        mcp_server: false
+        rate_limit_signal: none published
+        idempotency: natural-key on org_connection_id
+
+  - target: $.servers
+    update:
+      x-modes:
+        description: >-
+          One server serves both live and test mode. The API key prefix determines the mode —
+          private_test_ / public_test_ versus private_live_ / public_live_.
+        test_key_prefixes: [public_test_, private_test_]
+        live_key_prefixes: [public_live_, private_live_]
+
+  - target: $.paths['/bridge/fhir/ehi-export'].post
+    update:
+      x-idempotent: true
+      x-idempotency-key-field: org_connection_id
+      x-idempotency-note: >-
+        Documented as idempotent — a request whose org_connection_id is already registered returns
+        the existing request rather than creating a duplicate export.
+      x-async: true
+      x-completion-events:
+        - patient.ehi_export_success
+        - patient.ehi_export_failed
+      x-contains-phi: true
+      x-test-fixtures:
+        parameter: fixtures.tefca_ccda
+        values: [myra-jones.xml, myra-jones-v2.xml, myra-jones-v7.xml, lennie-connell.xml, bernice-maxwell.xml]
+
+  - target: $.paths['/bridge/fhir/ehi-export/{taskId}'].get
+    update:
+      x-polling-role: fallback
+      x-polling-note: >-
+        The provider's own Agent Skill documents webhooks as the primary completion signal and
+        polling as a fallback.
+
+  - target: $.paths['/bridge/fhir/ehi-export/{taskId}/download/{fileId}'].get
+    update:
+      x-contains-phi: true
+      x-redirect: 302 to a signed URL in the Location header
+      x-signed-url-ttl: 10 minutes
+      x-payload-format: application/fhir+ndjson (JSONL)
+      x-retention: Export files are deleted from Fasten storage after 24 hours.
+
+  - target: $.paths['/bridge/connect'].get
+    update:
+      x-human-in-the-loop: required
+      x-note: >-
+        302 redirect into a patient-facing portal authentication flow. Driven by the Stitch widget;
+        not agent-invocable.
+
+  - target: $.paths['/bridge/reconnect'].get
+    update:
+      x-human-in-the-loop: required
+      x-note: >-
+        302 redirect into patient re-authentication. Driven by the Stitch widget; not
+        agent-invocable.
+
+  - target: $.paths['/bridge/vault_connection/revoke'].post
+    update:
+      x-destructive: true
+      x-scope: test mode / TEFCA synthetic patients only
+      x-note: Revokes all vault connections for a synthetic test patient so the next run starts clean.
+
+  - target: $.paths['/bridge/catalog/search'].post
+    update:
+      x-pagination:
+        style: search-after
+        params: [searchAfter, sort]
+      x-response-typing-gap: >-
+        LighthouseCatalogSearchResults.hits is typed `object` with no inner structure, so results
+        are untyped in the contract.
+
+  - target: $.paths['/bridge/catalog/export'].get
+    update:
+      x-bulk: true
+      x-note: >-
+        Returns pre-signed URLs for JSON files covering every brand, portal and endpoint, for
+        hydrating an offline catalog cache instead of paginating.
+
+  - target: $.components.schemas.OrganizationConnection
+    update:
+      x-primary-key: org_connection_id
+      x-must-persist: true
+      x-tefca-note: >-
+        catalog_brand_id, catalog_portal_id and catalog_endpoint_id may all be absent in TEFCA mode;
+        tefca_directory_id identifies the health system instead.
+
+  - target: $.components.schemas.ResponseWrapper
+    update:
+      x-envelope: true
+      x-rfc9457: false
+      x-note: Proprietary success/error envelope; the API does not use application/problem+json.

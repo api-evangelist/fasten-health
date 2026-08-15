@@ -1,0 +1,204 @@
+generated: '2026-08-14'
+method: searched
+source: https://docs.connect.fastenhealth.com/changelog
+scheme: date-based
+format: >-
+  Dated entries tagged by surface (API, Stitch, Catalog, Portal, Webhooks & Events, TEFCA, Identity,
+  Docs, Quickstart, Deprecated) and sectioned Added / Changed / Fixed / Deprecated.
+current_version: 1.0.11
+current_version_note: OpenAPI info.version of the published Fasten Connect spec.
+entry_count: 72
+span:
+  first: '2024-09-30'
+  latest: '2026-08-04'
+cadence: >-
+  Roughly weekly through 2025, thinning to monthly in 2026. Breaking changes are rare; the record is
+  dominated by additive catalog, TEFCA and Stitch work.
+surfaces_tagged:
+  - API
+  - Stitch
+  - Catalog
+  - Portal
+  - Webhooks & Events
+  - TEFCA
+  - Identity
+  - Docs
+  - Quickstart
+  - Deprecated
+window: recent — the live changelog is the source of truth
+entries:
+  - date: '2026-08-04'
+    tags: [Portal]
+    kind: added
+    breaking: false
+    highlights:
+      - Developer Portal domain migrated from portal.connect.fastenhealth.com to portal.fastenhealth.com.
+      - Portal UI rebuilt for usability, accessibility and mobile.
+      - Multiple organizations per account, so one login can manage several projects or clients.
+      - Two-factor authentication and other security enhancements added.
+
+  - date: '2026-07-03'
+    tags: [Docs]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Test-data guide expanded with the official FooClinic sandbox — credentials, resource counts
+        and persona summaries for 16 synthetic patients, plus external FHIR/CCDA/IPS datasets.
+
+  - date: '2026-06-25'
+    tags: [Stitch, Docs]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Optional `email` attribute added to the v4 Stitch SDKs, to prepopulate the patient email in
+        TEFCA mode and in support / health-system request forms.
+
+  - date: '2026-06-19'
+    tags: [Docs, TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Clarified that TEFCA IAS mode requires cookies, and that localhost, private browsing or
+        incognito testing can trigger browser cookie restrictions.
+
+  - date: '2026-06-15'
+    tags: [Catalog, API]
+    kind: added
+    breaking: false
+    highlights:
+      - Catalog support added for Medent, Medplum sandbox testing and NextGen Office.
+
+  - date: '2026-05-29'
+    tags: [TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        TEFCA identity verification and demographic matching now include historical patient
+        addresses, improving matching for patients who have moved.
+
+  - date: '2026-05-24'
+    tags: [TEFCA, Catalog]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        TEFCA record-locator results now resolve facilities to the correct catalog brand, portal and
+        endpoint via Network Directory entries, improving tefca_directory_id consistency.
+
+  - date: '2026-05-17'
+    tags: [Identity, Stitch, API]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Customer-managed identity verification flows added, including OpenID Connect discovery,
+        JWKS, pushed authorization requests and consent decisions.
+      - >-
+        Bring Your Own CSP flows now launch the widget with `request_uri` and use a simplified scope
+        and a consent form aligned with the embedded widget.
+
+  - date: '2026-05-08'
+    tags: [Docs, Stitch]
+    kind: added
+    breaking: false
+    highlights:
+      - Beta documentation published for the Stitch React SDK.
+
+  - date: '2026-03-26'
+    tags: [API, Docs, TEFCA, Webhooks & Events]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Documented the `fixtures.tefca_ccda` option on POST /bridge/fhir/ehi-export, letting API-mode
+        TEFCA exports return a specific synthetic CCDA response during testing
+        (myra-jones.xml, lennie-connell.xml).
+
+  - date: '2026-03-25'
+    tags: [Docs, Webhooks & Events, TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Added `tefca_no_documents_found` as a documented failure_reason for patient.ehi_export_failed.
+
+  - date: '2026-03-12'
+    tags: [Catalog, API]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Added GET /bridge/catalog/export so customers can download pre-signed URLs for JSON files
+        covering every brand, portal and endpoint when hydrating offline catalog caches.
+
+  - date: '2026-03-07'
+    tags: [API, TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - >-
+        Documented POST /bridge/vault_connection/revoke for clearing TEFCA IAS synthetic patient
+        connections between test scenarios.
+
+  - date: '2026-01-13'
+    tags: [Stitch, Webhooks & Events, TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - Documented the `tefca_directory_id` field included on TEFCA IAS connections.
+
+  - date: '2026-01-03'
+    tags: [Docs, Stitch, Webhooks & Events, TEFCA]
+    kind: added
+    breaking: false
+    highlights:
+      - TEFCA IAS reached General Availability, with a new developer guide.
+      - patient.connection_success and patient.authorization_revoked left beta.
+      - Added `consent_expires_at` for determining when patient consent expires.
+      - Clarified the reconnect flow via `reconnect-org-connection-id`.
+
+  - date: '2025-12-22'
+    tags: [Docs]
+    kind: added
+    breaking: false
+    highlights:
+      - Display & Component Library guide added, covering fhir-react and fhirpath.js.
+
+  - date: '2025-10-19'
+    tags: [API, Deprecated]
+    kind: deprecated
+    breaking: true
+    highlights:
+      - >-
+        `download_link` on the patient.ehi_export_success webhook event deprecated, with removal
+        stated for June 2026; implementors must move to the `download_links` array.
+    note: >-
+      Still present and still flagged deprecated in the event reference as of 2026-08-14 — past the
+      announced removal window.
+
+  - date: '2025-02-07'
+    tags: [Stitch]
+    kind: added
+    breaking: false
+    highlights:
+      - Stitch.js v4 released.
+      - React Native SDK released.
+    note: >-
+      This entry is positioned between the 2026-03-07 and 2026-01-13 entries on the published page,
+      so its 2025 label appears to be a typo for 2026-02-07. Recorded as published.
+
+  - date: '2024-09-30'
+    tags: [API, Deprecated]
+    kind: deprecated
+    breaking: true
+    highlights:
+      - >-
+        `org_connection_id` on webhook events deprecated for EHI-Export status/download calls in
+        favour of `task_id`.
+    note: >-
+      The entry states removal "in Jan, 2024" — a date before the announcement. Appears to be an
+      error in the published changelog. The current OpenAPI path parameters use taskId.

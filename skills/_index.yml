@@ -1,0 +1,32 @@
+generated: '2026-08-14'
+method: searched
+source: https://docs.connect.fastenhealth.com/.well-known/agent-skills/fastenhealth/skill.md
+note: >-
+  Fasten Health publishes its own Agent Skill at a /.well-known/agent-skills/ path, referenced by
+  the A2A agent card it serves from the same host. The file is saved VERBATIM — API Evangelist did
+  not author, edit or supplement it. No skill was generated on the provider's behalf.
+skills:
+  - file: fasten-health-fastenhealth-skill.md
+    name: Fastenhealth
+    description: >-
+      Use when building patient-facing medical record access flows, integrating health data
+      collection into applications, managing patient consent workflows, or requesting and
+      processing FHIR-formatted health records from healthcare providers.
+    api: openapi/fasten-health-connect-openapi-original.yml
+    provider_published: true
+    source: https://docs.connect.fastenhealth.com/.well-known/agent-skills/fastenhealth/skill.md
+    discovered_via: https://docs.connect.fastenhealth.com/.well-known/agent-card.json
+    operations:
+      - POST /bridge/fhir/ehi-export
+      - GET /bridge/fhir/ehi-export/{taskId}
+      - GET /bridge/fhir/ehi-export/{taskId}/download/{fileId}
+      - GET /bridge/org_connection/{orgConnectionId}
+      - POST /bridge/catalog/search
+    operations_note: >-
+      Referenced by method + path rather than operationId: the published Fasten Connect OpenAPI
+      1.0.11 declares no operationId on any of its 12 operations, so there is no id to cite.
+x-evidence:
+  fetched: '2026-08-14'
+  url: https://docs.connect.fastenhealth.com/.well-known/agent-skills/fastenhealth/skill.md
+  http_status: 200
+  bytes: 12792

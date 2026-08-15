@@ -1,0 +1,73 @@
+generated: '2026-08-14'
+method: probed
+source: https://docs.connect.fastenhealth.com/.well-known/agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: docs.connect.fastenhealth.com
+  note: >-
+    Served from the Fasten Connect documentation host. The canonical A2A 1.0.0 path returned the
+    card; the legacy /.well-known/agent.json path 404s on every Fasten host, as do all
+    /.well-known/* paths on www.fastenhealth.com, portal.fastenhealth.com and
+    blog.fastenhealth.com. api.connect.fastenhealth.com answers 403 to every unauthenticated
+    /.well-known/* request.
+conformance:
+  spec: A2A 1.0.0
+  grade: near-conformant
+  protocol_version: '0.3'
+  preferred_transport: HTTP+JSON
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_present:
+    - preferredTransport
+    - defaultInputModes
+    - defaultOutputModes
+    - provider
+    - documentationUrl
+  deviations:
+    - id: supported-interfaces-not-additional-interfaces
+      detail: >-
+        The card declares `supportedInterfaces[]`. A2A 1.0.0 names this field `additionalInterfaces`.
+        A strict 1.0.0 client will not read the declared interface list.
+    - id: protocol-version-not-full-semver
+      detail: >-
+        `protocolVersion` is "0.3" rather than a full patch-level version such as "0.3.0".
+    - id: skill-url-points-at-markdown-not-endpoint
+      detail: >-
+        The single skill's `url` resolves to an Agent Skill markdown file
+        (/.well-known/agent-skills/fastenhealth/skill.md), not to an invocable A2A endpoint. The
+        card documents an agent-readable capability rather than exposing a callable A2A agent.
+  grade_rationale: >-
+    Passes all three hard checks (capabilities object, protocolVersion present, skills array) so it
+    is not `flavored`, but it carries a real 1.0.0 field-naming deviation, so it is not recorded as
+    fully `conformant`.
+card:
+  name: Fasten Connect
+  url: https://docs.connect.fastenhealth.com/
+  version: 1.0.0
+  organization: Fasten Connect
+  documentation_url: https://docs.connect.fastenhealth.com/
+  capabilities:
+    streaming: false
+    pushNotifications: false
+  skills: 1
+  skill_ids:
+    - fastenhealth
+  file: fasten-health-agent-card.json
+x-evidence:
+  fetched: '2026-08-14'
+  url: https://docs.connect.fastenhealth.com/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  bytes: 970
+  negative_probes:
+    - url: https://docs.connect.fastenhealth.com/.well-known/agent.json
+      http_status: 404
+    - url: https://www.fastenhealth.com/.well-known/agent-card.json
+      http_status: 404
+    - url: https://portal.fastenhealth.com/.well-known/agent-card.json
+      http_status: 404
+    - url: https://api.connect.fastenhealth.com/.well-known/agent-card.json
+      http_status: 403

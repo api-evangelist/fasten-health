@@ -1,0 +1,147 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/webhooks/introduction,
+  https://docs.connect.fastenhealth.com/webhooks/events,
+  https://docs.connect.fastenhealth.com/webhooks/delivery,
+  https://docs.connect.fastenhealth.com/webhooks/verification
+spec_type: null
+asyncapi_published: false
+asyncapi_probe:
+  - url: https://docs.connect.fastenhealth.com/asyncapi.yaml
+    status: 404
+  - url: https://docs.connect.fastenhealth.com/api-reference/asyncapi.yaml
+    status: 404
+note: >-
+  Fasten Connect has a real, well-documented event surface but publishes NO AsyncAPI document. The
+  webhook catalog below is captured from the provider's own event reference; no AsyncAPI was
+  generated on their behalf. Events are the primary completion signal for bulk EHI export, not an
+  optional extra — the export API is asynchronous by design.
+
+transport: https-webhook
+configuration: >-
+  Endpoints are registered in the Fasten Developer Portal (https://portal.fastenhealth.com), with
+  separate endpoints and separate signing secrets for test and live modes. Event types are
+  individually selectable per endpoint.
+
+security:
+  signature_header: Webhook-Signature
+  scheme: Standard Webhooks (https://www.standardwebhooks.com/)
+  secret_source: Signing Secret, revealed on the endpoint's Delivery Logs page in the portal
+  replay_protection: signed timestamp inside the signature
+  libraries: >-
+    Any Standard Webhooks implementation. The docs show JavaScript, Go, Python, Ruby and Java
+    examples using the community `standardwebhooks` libraries; Fasten ships no first-party
+    verification SDK.
+
+delivery:
+  guarantee: at-least-once
+  deduplication_key: id (UUIDv4, on every event)
+  retries: 4
+  failure_conditions:
+    - non-2xx response
+    - response slower than 60 seconds
+    - connection error
+  auto_disable: true
+  auto_disable_notice: email alert; manual re-enable in portal under Developers > Webhooks
+  handler_guidance: respond 200 immediately, then process asynchronously via a queue
+  log_retention_days: 15
+
+event_count: 7
+events:
+  - type: patient.ehi_export_success
+    description: Bulk EHI export completed; records are ready to download.
+    enabled_by_default: true
+    fields:
+      - {name: download_links, type: "object[]", required: true, note: "url + export_type + content_type; jsonl/application/fhir+ndjson by default"}
+      - {name: org_connection_id, type: string}
+      - {name: task_id, type: string}
+      - {name: org_id, type: string}
+      - {name: stats, type: object, required: true, note: "total_resources + total_by_resource_type keyed by FHIR resource type"}
+      - {name: download_link, type: object, deprecated: true, note: "superseded by download_links"}
+
+  - type: patient.ehi_export_failed
+    description: Bulk EHI export failed.
+    enabled_by_default: true
+    fields:
+      - {name: failure_reason, type: string, required: true, enum_ref: errors/fasten-health-problem-types.yml}
+      - {name: org_connection_id, type: string}
+      - {name: task_id, type: string}
+      - {name: org_id, type: string}
+
+  - type: patient.connection_success
+    description: >-
+      Patient successfully connected to the health system and the popup window closed. Documented as
+      the durable backend signal for a completed consent; connection FAILURES are not yet available
+      as a webhook event.
+    enabled_by_default: false
+    enablement: toggle in the Fasten Connect dashboard per webhook endpoint
+    fields:
+      - {name: org_connection_id, type: string, required: true}
+      - {name: endpoint_id, type: string, required: true, note: "may be omitted in TEFCA mode"}
+      - {name: portal_id, type: string, required: true, note: "may be omitted in TEFCA mode"}
+      - {name: brand_id, type: string, required: true, note: "may be omitted in TEFCA mode"}
+      - {name: connection_status, type: string, required: true, enum: [authorized, revoked]}
+      - {name: platform_type, type: string, required: true, note: EHR type of the connected endpoint}
+      - {name: request_id, type: string, note: correlation id for support tickets}
+      - {name: external_id, type: string, note: opaque integrator-supplied patient identifier}
+      - {name: external_state, type: string, note: identifies a unique connection attempt}
+      - {name: scope, type: string, note: "SMART on FHIR scope granted; always patient/*.read in TEFCA mode"}
+      - {name: consent_expires_at, type: string, format: rfc3339}
+      - {name: tefca_directory_id, type: string, note: present for TEFCA-connected health systems}
+
+  - type: patient.authorization_revoked
+    description: >-
+      Patient consent revoked or expired, detected when Fasten's periodic token refresh fails.
+      Fasten may revoke connections in bulk, so handlers must tolerate many events at once.
+    enabled_by_default: false
+    enablement: toggle in the Fasten Connect dashboard per webhook endpoint
+    fields:
+      - {name: org_connection_id, type: string, required: true}
+      - {name: endpoint_id, type: string}
+      - {name: portal_id, type: string}
+      - {name: brand_id, type: string}
+      - {name: platform_type, type: string, required: true}
+      - {name: connection_status, type: string, required: true, note: always "revoked"}
+
+  - type: patient.request_health_system
+    description: Patient asked for a health system that is not yet in the Fasten catalog.
+    fields:
+      - {name: email, type: string, required: true}
+      - {name: name, type: string, required: true}
+      - {name: website, type: string}
+      - {name: street_address, type: string}
+
+  - type: patient.request_support
+    status: beta
+    description: Patient requested support during the connection process.
+    fields:
+      - {name: email, type: string, required: true}
+      - {name: name, type: string}
+      - {name: body, type: string, required: true, warning: "may contain PII or PHI; format is arbitrary and subject to change"}
+
+  - type: webhook.test
+    description: Manual test event fired from the webhook simulator.
+    fields:
+      - {name: hello, type: string}
+      - {name: random, type: string}
+
+envelope:
+  fields:
+    - {name: id, type: string, format: uuidv4, note: unique event id; the documented deduplication key}
+  note: >-
+    The introduction page shows the event envelope carrying an `id`; per-event documentation covers
+    the payload body only.
+
+tooling:
+  simulator: https://docs.connect.fastenhealth.com/guides/webhook-debugging-simulator
+  delivery_logs: >-
+    Per-endpoint delivery logs in the Developer Portal showing response code, body and headers for
+    the last 15 days.
+
+gaps:
+  - No AsyncAPI (or CloudEvents) document is published for this event surface.
+  - Connection FAILURE has no event; only success is emitted.
+  - >-
+    Two of the four lifecycle events (patient.connection_success, patient.authorization_revoked)
+    are off by default and must be enabled per endpoint in the dashboard.

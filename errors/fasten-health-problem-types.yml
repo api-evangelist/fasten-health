@@ -1,0 +1,90 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  openapi/fasten-health-connect-openapi-original.yml,
+  https://docs.connect.fastenhealth.com/webhooks/events,
+  https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+format: proprietary
+rfc9457: false
+envelope: openapi/fasten-health-connect-openapi-original.yml#/components/schemas/ResponseWrapper
+summary: >-
+  Fasten Connect publishes no API-level error catalog and no RFC 9457 problem+json contract. The
+  published OpenAPI 1.0.11 declares ONLY success responses — every one of its 12 operations models
+  a single 200 (or 302) and no 4xx or 5xx at all — so no error shape can be derived from the spec.
+  What the provider does document richly is a domain failure enum delivered over webhooks, plus an
+  OAuth-style error contract that the INTEGRATOR must implement in the Bring Your Own Identity flow.
+
+spec_coverage:
+  operations_total: 12
+  operations_with_4xx_or_5xx: 0
+  declared_status_codes: [200, 302]
+  note: >-
+    This is a genuine gap in the contract, not a harvesting failure: an integrator cannot learn the
+    error shape of any Fasten Connect operation from the machine-readable spec.
+
+problems: []
+
+domain_failures:
+  delivered_on: patient.ehi_export_failed webhook event
+  field: failure_reason
+  source: https://docs.connect.fastenhealth.com/webhooks/events
+  values:
+    - code: token_refresh_failure
+      meaning: An error was encountered while refreshing the patient's access token.
+      action: Prompt the patient to reconnect via /bridge/reconnect or Stitch reconnect mode.
+    - code: scope_patient_missing
+      meaning: >-
+        The access token lacks the required patient/*.read or patient/Patient.read scope, usually
+        because the patient unchecked "Demographics" during consent.
+      action: Ask the patient to reconnect and leave Demographics enabled.
+    - code: resource_patient_failure
+      meaning: >-
+        Fetching a patient resource failed even though the token appears to have refreshed
+        successfully. Documented as unusual.
+      action: Retry; contact support if persistent.
+    - code: resource_invalid_content
+      meaning: A critical FHIR resource failed to parse.
+      action: Contact Fasten support with the task_id.
+    - code: tefca_no_documents_found
+      meaning: >-
+        TEFCA mode only. The health system returned no records for the individual. Frequent in test
+        mode, uncommon in live mode.
+      action: >-
+        In test mode, set fixtures.tefca_ccda on the EHI export request to force a known synthetic
+        response.
+    - code: suppressed_please_contact
+      meaning: >-
+        The error was suppressed because it may contain PII or PHI. This is the DEFAULT value of
+        failure_reason.
+      action: Contact Fasten support for the underlying cause.
+      note: >-
+        Because this is the default, an integrator's most likely observed failure carries no
+        machine-actionable cause.
+
+integrator_implemented_errors:
+  context: Bring Your Own Identity — Customer Token Exchange endpoint
+  direction: >-
+    These are errors the INTEGRATOR's endpoint returns TO Fasten, not errors Fasten returns to the
+    integrator. Documented as OAuth-compatible JSON with Cache-Control: no-store.
+  source: https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+  shape:
+    error: string
+    error_description: string
+  codes:
+    - {status: 400, error: invalid_request, use_when: Required form fields are missing, malformed, duplicated or unsupported.}
+    - {status: 400, error: invalid_grant, use_when: The CSP grant is expired, revoked, inactive or not valid for the patient.}
+    - {status: 400, error: unsupported_grant_type, use_when: grant_type is not the RFC 8693 token-exchange grant.}
+    - {status: 400, error: invalid_target, use_when: The requested token type, CSP, audience or resource is not allowed.}
+    - {status: 401, error: invalid_client, use_when: Fasten's client assertion is missing, invalid, expired, replayed or signed by an untrusted key.}
+    - {status: 429, error: temporarily_unavailable, use_when: The endpoint is rate limiting Fasten. Include Retry-After.}
+
+client_events:
+  note: >-
+    Stitch client-side error signals are delivered on the widget event bus rather than as HTTP
+    errors. See https://docs.connect.fastenhealth.com/stitch/v4/client-events.
+
+gaps:
+  - No published API error reference page.
+  - No error codes, no problem types, no application/problem+json.
+  - No 4xx/5xx responses modelled anywhere in the OpenAPI.
+  - The default webhook failure_reason is an opaque "contact support" value.

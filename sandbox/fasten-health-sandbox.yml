@@ -1,0 +1,127 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/api-reference/introduction,
+  https://docs.connect.fastenhealth.com/guides/test-data,
+  https://docs.connect.fastenhealth.com/guides/test-patient-credentials,
+  https://docs.connect.fastenhealth.com/guides/webhook-debugging-simulator
+summary: >-
+  Fasten Connect has one of the more substantial sandboxes in patient-access healthcare: a full
+  test/live key split, a first-party synthetic FHIR server (FooClinic) with 16 documented patient
+  personas, deterministic C-CDA fixtures selectable per API request for TEFCA testing, a curated
+  index of third-party EHR sandbox logins, and a webhook simulator. Every value below is published
+  by the provider and reproduced as documented; none were invented.
+
+test_live_separation:
+  mechanism: key-prefix
+  description: >-
+    The API key used determines whether a request is live or test. Test mode never touches live data
+    and only reaches synthetic patient data in healthcare-institution sandboxes.
+  keys:
+    - {mode: test, role: client-side, prefix: public_test_, description: "Test mode key identifying your app; safe in the browser."}
+    - {mode: test, role: server-side, prefix: private_test_, description: "Test mode authenticated-request key. Must be kept secret."}
+    - {mode: live, role: client-side, prefix: public_live_, description: "Live mode key identifying your app; safe in the browser."}
+    - {mode: live, role: server-side, prefix: private_live_, description: "Live mode authenticated-request key. Must be kept secret."}
+  separate_webhooks: >-
+    Webhook endpoints and their signing secrets are separate per mode; the same URL registered under
+    both modes gets a different signing secret for each.
+  signup: https://portal.fastenhealth.com
+
+first_party_sandbox:
+  name: FooClinic
+  description: >-
+    Fasten's official sandbox test server, selectable as "FooClinic (Sandbox)" in the Stitch widget
+    health-system list. Provides predictable synthetic personas for end-to-end validation of the
+    consent flow and downstream EHI export handling.
+  source_repo: https://github.com/fastenhealth/fooclinic
+  docs: https://docs.connect.fastenhealth.com/guides/test-data#official-fooclinic-test-data
+  shared_password: f00clinic
+  shared_password_note: All 16 documented FooClinic personas share one published sandbox password.
+  persona_count: 16
+  ages_as_of: '2026-07'
+  personas:
+    - {username: 'annegoodwin@fooclinic.com', resources: 421, persona: "14yo female childhood asthma; care transition/relocation data, 45 DocumentReferences, 47 DiagnosticReports, 25 Immunizations, 232 Observations."}
+    - {username: 'salinatesfay@fooclinic.com', resources: 333, persona: "17yo female childhood obesity; 6 JSON DocumentReferences, 1 DX ImagingStudy, 2 DiagnosticReports."}
+    - {username: 'sydneyphar@fooclinic.com', resources: 8, persona: "16yo female compact childhood obesity; 2 JSON DocumentReferences."}
+    - {username: 'aaronreichert@fooclinic.com', resources: 573, persona: "71yo male mCode oncology; 32 text DocumentReferences, 1 DX ImagingStudy, 60 DiagnosticReports."}
+    - {username: 'alexmarvin@fooclinic.com', resources: 212, persona: "83yo male mCode oncology; 18 text DocumentReferences, 22 DiagnosticReports."}
+    - {username: 'betsyjohnson@fooclinic.com', resources: 24, persona: "75yo female PACIO advance care planning; end-of-life preferences, Consent, Device, DocumentManifest, 17 Observations."}
+    - {username: 'earlcarrillo@fooclinic.com', resources: 3556, persona: "60yo male non-small-cell lung cancer; high-volume — 3 Devices, 294 DiagnosticReports, 91 DocumentReferences, 2755 Observations, 277 Procedures."}
+    - {username: 'johndoe@fooclinic.com', resources: 11, persona: "71yo male compact diabetic baseline; Device, DiagnosticReport, Medication, MedicationStatement, Immunization."}
+    - {username: 'marcellaschumm@fooclinic.com', resources: 531, persona: "38yo female complex chronic illness and pregnancy; 56 DocumentReferences, 79 DiagnosticReports, 153 Observations, 141 Procedures."}
+    - {username: 'markusward@fooclinic.com', resources: 1919, persona: "53yo male congestive heart failure and cardiac rehab; 2 Devices, 320 DocumentReferences, 399 DiagnosticReports, 748 Observations."}
+    - {username: 'patricianoelle@fooclinic.com', resources: 19, persona: "71yo female compact MCC eCarePlan/asthma; CareTeam, ServiceRequest, QuestionnaireResponse, referral workflow."}
+    - {username: 'seasonoconnell@fooclinic.com', resources: 1387, persona: "102yo female Coherent persona; 2 ImagingStudies, 1 ECG Media, DICOM Binary, DNA CSV Binary sidecar."}
+    - {username: 'spencerthompson@fooclinic.com', resources: 284, persona: "12yo male acute myeloid leukemia; CarePlan/CareTeam, Claims, Immunizations, 199 Observations."}
+    - {username: 'williamsim@fooclinic.com', resources: 10, persona: "13yo male pediatric oncology-style; radiology procedure history, Conditions, Encounters, Procedures."}
+    - {username: 'wilmanader@fooclinic.com', resources: 220, persona: "19yo female COVID-19 / Long COVID home health; CarePlan/CareTeam, Claims, Immunizations, 137 Observations, QuestionnaireResponse."}
+    - {username: 'aletaortiz@fooclinic.com', resources: 305, persona: "112yo female Coherent persona; 1 DX ImagingStudy, 1 Device, DICOM Binary, DNA CSV Binary sidecar."}
+  custom_personas: >-
+    New synthetic test patients can be requested from support@fastenhealth.com with a persona
+    summary, required FHIR resource types, expected volume and edge cases.
+
+fixtures:
+  name: TEFCA C-CDA test fixtures
+  parameter: fixtures.tefca_ccda
+  operation: POST /bridge/fhir/ehi-export
+  applies_to: test mode, TEFCA API mode
+  purpose: >-
+    Force a deterministic synthetic C-CDA response, and the documented workaround for the common
+    tefca_no_documents_found failure in test mode.
+  values:
+    - {fixture: myra-jones.xml, fhir_resources: 51, description: "Myra Jones, 79yo female. Older-adult pneumonia and asthma record with allergies, encounters, discharge medications, functional status, social history, vital signs."}
+    - {fixture: myra-jones-v2.xml, fhir_resources: 26, description: "Compact Myra variant for regression-testing converter handling of optional or missing values."}
+    - {fixture: myra-jones-v7.xml, fhir_resources: 81, description: "Larger Myra variant with broader allergy, condition, diagnostic, medication, observation, procedure and care-plan coverage."}
+    - {fixture: lennie-connell.xml, fhir_resources: 44, description: "Lennie Connell, 62yo male. Acute pharyngitis, atrial fibrillation, flu-like illness, tobacco use, medications, plans, procedures, immunizations, results."}
+    - {fixture: bernice-maxwell.xml, fhir_resources: 43, description: "Bernice Maxwell, 85yo female. EMERGE health-summary sample covering allergies, encounters, immunizations, medications, conditions, procedures, observations, related persons."}
+  duplicate_patient_coverage: >-
+    The three Myra fixtures deliberately share demographics across different C-CDA documents, giving
+    integrations duplicate-patient coverage without inventing a synthetic identity.
+
+third_party_sandbox_logins:
+  docs: https://docs.connect.fastenhealth.com/guides/test-patient-credentials
+  description: >-
+    Fasten curates an index of published vendor sandbox patient logins so integrators can walk the
+    real OAuth consent flow against major EHR and payer portals in test mode. These credentials are
+    published by the respective vendors, not issued by Fasten, and only work while the integration
+    runs in test mode.
+  vendors_listed: 24
+  vendors_with_credentials:
+    [Aetna, Anthem, AthenaHealth, CareEvolution, Cerner, Cigna, eClinicalWorks/Healow, Epic,
+     HealthIT, Humana, Kaiser, Medicare, NextGen, VA Health]
+  vendors_listed_without_credentials:
+    [AdvancedMD, AllScripts, DynamicHealthIT, Flatiron/OncoEMR, Logica, MaximEyes, Medhost,
+     Meditech, Netsmart, PracticeFusion/PatientFusion]
+  caveat: >-
+    Fasten warns that sandbox accounts vary widely in quantity and quality of data, and recommends
+    FooClinic or external synthetic datasets for UI and ML testing.
+  note: >-
+    Values are not reproduced here — they are third-party vendor credentials, published on each
+    vendor's own developer site and indexed by Fasten. See the guide for the table.
+
+time_simulation:
+  supported: false
+  note: No test clocks or time-simulation tooling is documented.
+
+tooling:
+  - name: Webhook Debugging & Simulator
+    url: https://docs.connect.fastenhealth.com/guides/webhook-debugging-simulator
+    description: >-
+      Fire test events at a registered endpoint and inspect delivery logs (response code, body and
+      headers). The webhook.test event carries a fixed {"hello": "world"} style payload.
+  - name: Delivery Logs
+    url: https://portal.fastenhealth.com
+    description: Per-endpoint delivery history, retained 15 days.
+  - name: Quickstart sample app
+    url: https://github.com/fastenhealth/fasten-connect-quickstart
+    description: MIT-licensed end-to-end JavaScript integration sample.
+  - name: TEFCA synthetic patient reset
+    operation: POST /bridge/vault_connection/revoke
+    description: >-
+      Revokes all vault connections for a TEFCA synthetic test patient so the next test run starts
+      from a clean slate.
+
+external_datasets:
+  note: >-
+    The test-data guide also indexes third-party synthetic FHIR, clinical research, C-CDA and IPS
+    datasets for broader volume and format coverage.

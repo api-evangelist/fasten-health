@@ -1,0 +1,134 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/stitch/v4/introduction,
+  https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/quickstart,
+  https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/quickstart,
+  https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/quickstart,
+  https://docs.connect.fastenhealth.com/stitch/v4/client-events,
+  https://docs.connect.fastenhealth.com/guides/display-component-library
+summary: >-
+  Fasten's client-side surface is larger than its server-side one. Stitch is a hosted, embeddable
+  patient consent widget shipped in four runtime targets, and it is the ONLY supported way to obtain
+  the org_connection_id every server-side operation depends on — the components are load-bearing,
+  not optional convenience.
+
+families:
+  - family: Stitch
+    version: v4
+    description: >-
+      Client-side embeddable component that lets a patient pick their healthcare provider,
+      authenticate with that provider's portal, and grant data-sharing consent inside the host
+      application. Emits connection lifecycle, error and consent signals back to the host.
+    docs: https://docs.connect.fastenhealth.com/stitch/v4/introduction
+    supported_versions: [v4]
+    maintenance_mode: [v1, v3]
+    components:
+      - name: fasten-stitch-element
+        kind: web-component
+        tag: <fasten-stitch-element>
+        runtime: any web runtime (framework-neutral custom element)
+        loader_js: https://cdn.fastenhealth.com/connect/v4/fasten-stitch-element.js
+        loader_css: https://cdn.fastenhealth.com/connect/v4/fasten-stitch-element.css
+        distribution: CDN (unpinned, floats at the /connect/v4/ path)
+        docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/quickstart
+        reference: https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/reference
+
+      - name: FastenStitchElement (React)
+        kind: react-component
+        runtime: React 18+ web
+        package: "@fastenhealth/fasten-stitch-element-react"
+        version: 1.0.4
+        published: '2026-06-25'
+        distribution: npm
+        description: >-
+          Renders a trigger button that opens the widget in a modal. Typed props, React refs with
+          show()/hide(), component-level styling.
+        docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/quickstart
+        reference: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/reference
+
+      - name: FastenStitchElement (React Native)
+        kind: react-native-component
+        runtime: iOS + Android via React Native
+        package: "@fastenhealth/fasten-stitch-element-react-native"
+        version: 1.0.6
+        published: '2026-07-31'
+        peer_dependency: react-native-webview
+        distribution: npm
+        description: >-
+          Mirrors the web component experience in a native modal; forwards the same event payloads.
+          Bare React Native needs `npx pod-install`.
+        docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/quickstart
+        reference: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/reference
+
+      - name: fasten-stitch-element-flutter
+        kind: flutter-widget
+        runtime: Flutter
+        repository: https://github.com/fastenhealth/fasten-stitch-element-flutter
+        status: alpha
+        version: null
+        distribution: source-only (not published to pub.dev)
+        docs: null
+        note: >-
+          Self-described "[ALPHA] Work-in-progress", MIT licensed, last pushed 2026-08-08. Not
+          referenced from the Stitch documentation, which covers three targets only.
+
+    configuration:
+      attributes:
+        - {name: public-id, type: string, required: true, description: API public ID from the Developer Portal.}
+        - {name: external-id, type: string, required: false, description: Your internal patient/user ID; echoed back in events.}
+        - {name: email, type: string, required: false, description: Prepopulates the email field in TEFCA mode and in support / health-system request forms. Added 2026-06-25.}
+        - {name: tefca-mode, type: boolean, required: false, description: Enable the TEFCA IAS identity-proofing flow instead of portal search.}
+        - {name: reconnect-org-connection-id, type: string, required: false, description: Skip provider search and go straight to re-authentication of an existing connection.}
+        - {name: show-splash, type: boolean, required: false, description: Show an intro page carrying privacy and terms.}
+        - {name: identity-request-uri, type: string, required: false, description: "Single-use PAR request_uri for the Bring Your Own Identity flow (expires in 90 seconds)."}
+      react_prop_equivalents: [publicId, externalId, tefcaMode, onEventBus, buttonStyle, children]
+
+    events:
+      channel: eventBus
+      docs: https://docs.connect.fastenhealth.com/stitch/v4/client-events
+      key_event: widget.complete
+      key_payload: data[0].org_connection_id
+      note: >-
+        The host app reads org_connection_id off widget.complete and forwards it to its backend over
+        a secure channel. patient.connection_success is the durable server-side equivalent.
+
+    playgrounds:
+      - {name: React Web Playground, url: 'https://github.com/fastenhealth/react-web-playground', license: MIT}
+      - {name: React Native Playground, url: 'https://github.com/fastenhealth/react-native-playground', license: MIT}
+      - {name: Flutter Playground, url: 'https://github.com/fastenhealth/flutter-playground'}
+      - {name: Quickstart sample, url: 'https://github.com/fastenhealth/fasten-connect-quickstart', license: MIT}
+
+  - family: FHIR display components
+    description: >-
+      Rendering layer for the FHIR resources an export returns. Fasten documents these in its
+      Display & Component Library guide but does not publish them itself.
+    docs: https://docs.connect.fastenhealth.com/guides/display-component-library
+    components:
+      - name: fhir-react
+        kind: react-component-library
+        package: fhir-react
+        version: 2.1.1
+        published: '2026-04-20'
+        official: false
+        upstream_repository: https://github.com/1uphealth/fhir-react
+        fasten_fork: https://github.com/fastenhealth/fhir-react
+        description: React component library for displaying FHIR resources.
+        note: >-
+          Recommended by Fasten and forked into its GitHub org, but the published npm package is
+          1upHealth's. Not a Fasten-authored component.
+      - name: fhirpath.js
+        kind: library
+        official: false
+        description: >-
+          Recommended for extracting individual fields from FHIR resources when a full rendering
+          library is unnecessary.
+
+  - family: Developer tooling UI
+    components:
+      - name: Fasten Toolbox
+        url: https://github.com/fastenhealth/fasten-toolbox
+        description: >-
+          Standalone FHIR developer tools — catalog browsing, display component previews, and the
+          catalog-correction request flow documented at /guides/catalog-editor.
+        docs: https://docs.connect.fastenhealth.com/guides/catalog-editor

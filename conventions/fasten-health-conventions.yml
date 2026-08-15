@@ -1,0 +1,210 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/api-reference/introduction,
+  https://docs.connect.fastenhealth.com/api-reference/authentication,
+  https://docs.connect.fastenhealth.com/guides/caching-strategy,
+  https://docs.connect.fastenhealth.com/webhooks/delivery,
+  https://docs.connect.fastenhealth.com/webhooks/introduction,
+  https://docs.connect.fastenhealth.com/changelog,
+  openapi/fasten-health-connect-openapi-original.yml
+summary: >-
+  Fasten Connect is a resource-oriented JSON REST API with a single URI-path version (/v1), HTTP
+  Basic authentication using mode-prefixed key pairs, and an asynchronous webhook-driven core: the
+  expensive operation (bulk EHI export) is a task you register and then learn about via events, not
+  a request you wait on.
+
+authentication:
+  style: http-basic
+  header: 'Authorization: Basic base64(public_id:private_key)'
+  username: API Public ID
+  password: API Private Key
+  key_modes:
+    - mode: test
+      public_prefix: public_test_
+      private_prefix: private_test_
+      description: Client-side and server-side test keys. Only reach synthetic sandbox data.
+    - mode: live
+      public_prefix: public_live_
+      private_prefix: private_live_
+      description: Production keys. The key used determines whether a request is live or test.
+  client_side_key: >-
+    The public ID is safe in the browser and is passed to the Stitch widget as `public-id`. The
+    private key is server-only and the docs warn against exposing it in browser code.
+  note: >-
+    The Stitch quickstart samples show a `pub_live_` prefix in one HTML example while the API
+    reference documents `public_live_`. The API reference is authoritative.
+  see: authentication/fasten-health-authentication.yml
+
+idempotency:
+  supported: true
+  style: natural-key
+  mechanism: >-
+    Idempotency is keyed on a resource identifier in the request body rather than on a client-supplied
+    Idempotency-Key header. POST /bridge/fhir/ehi-export is documented as idempotent: "If a request
+    with the same `org_connection_id` has already been registered, it will return the existing
+    request." Re-posting an export for a connection returns the original task instead of starting a
+    duplicate export.
+  key_field: org_connection_id
+  operations:
+    - POST /bridge/fhir/ehi-export
+  idempotency_key_header: null
+  retention: null
+  consumer_side:
+    requirement: required
+    mechanism: >-
+      Webhook delivery is at-least-once. Every event carries an `id` (UUIDv4) that uniquely
+      identifies it; the docs instruct integrators to log processed event IDs and skip
+      already-logged ones. Retries generate a new signature and timestamp but preserve the event id.
+    key_field: id
+  source:
+    - https://docs.connect.fastenhealth.com/api-reference/ehi_export/create
+    - https://docs.connect.fastenhealth.com/webhooks/introduction
+    - https://docs.connect.fastenhealth.com/webhooks/delivery
+
+pagination:
+  style: search-after
+  applies_to:
+    - POST /bridge/catalog/search
+  params:
+    - name: searchAfter
+      description: >-
+        Cursor token echoed from the previous page's results. Per the 2025-11 changelog entry,
+        `searchAfter` no longer needs to be converted to a string array.
+    - name: sort
+      description: >-
+        Sort values may be passed back to the API as-is, in a mixed array of numbers and strings.
+  bulk_alternative:
+    operation: GET /bridge/catalog/export
+    description: >-
+      Rather than paginating the full catalog, integrators can request pre-signed URLs for JSON
+      files covering every brand, portal and endpoint, and hydrate an offline catalog cache.
+  note: >-
+    Pagination is documented only through changelog entries and the search endpoint's schema; there
+    is no dedicated pagination reference page.
+
+versioning:
+  scheme: uri-path
+  current: v1
+  base_url: https://api.connect.fastenhealth.com/v1
+  spec_version: 1.0.11
+  sdk_versioning: >-
+    The Stitch client is versioned independently on a major track exposed in the CDN path
+    (/connect/v4/) and in the docs URL namespace (/stitch/v4/). v4 is documented as backwards
+    compatible with v3 with no breaking public-API changes.
+  see: lifecycle/fasten-health-lifecycle.yml
+
+error_envelope:
+  shape: ResponseWrapper
+  schema: openapi/fasten-health-connect-openapi-original.yml#/components/schemas/ResponseWrapper
+  rfc9457: false
+  content_type: application/json
+  note: >-
+    Every documented response is wrapped in a common ResponseWrapper envelope. The API does not use
+    application/problem+json and the published OpenAPI declares only 200/302 responses — no 4xx or
+    5xx response is modelled on any of the 12 operations.
+  see: errors/fasten-health-problem-types.yml
+
+request_tracing:
+  field: request_id
+  transport: webhook payload + support tickets
+  description: >-
+    A correlation id delivered on the patient.connection_success webhook event (documented as
+    `request-id` in the field table and `request_id` in the payload example). The support docs ask
+    integrators to include it with any support query. It is not documented as an HTTP response
+    header.
+  organization_id: >-
+    Support and FAQ pages ask for `organization_id`, the customer identifier, when debugging
+    billing, payment and webhook issues.
+
+caching:
+  server_side: true
+  scope: per connection_id
+  ttl: 24h
+  description: >-
+    Fasten caches records it retrieves on the integrator's behalf. Repeat requests for the same
+    connection_id are served from cache for 24 hours from first retrieval, after which the copy is
+    deleted and the next request triggers a fresh retrieval. Cache eviction is not client-managed;
+    there is no documented cache-busting parameter — the docs say to wait for expiry or ask support
+    for a manual refresh.
+  client_headers: null
+  source: https://docs.connect.fastenhealth.com/guides/caching-strategy
+
+asynchrony:
+  model: register-task-then-webhook
+  description: >-
+    POST /bridge/fhir/ehi-export registers a task and returns immediately with a task_id. Completion
+    is signalled by the patient.ehi_export_success / patient.ehi_export_failed webhook events.
+    Polling GET /bridge/fhir/ehi-export/{taskId} exists but the provider's own agent skill documents
+    it as a fallback, not the primary path.
+  download:
+    operation: GET /bridge/fhir/ehi-export/{taskId}/download/{fileId}
+    mechanism: 302 redirect to a signed URL in the Location header
+    signed_url_ttl: 10 minutes
+    payload_format: JSONL (NDJSON)
+    content_type: application/fhir+ndjson
+    retention: Exports are deleted from Fasten storage after 24 hours.
+  see: asyncapi/fasten-health-webhooks.yml
+
+webhook_semantics:
+  delivery: at-least-once
+  signature_header: Webhook-Signature
+  signature_spec: Standard Webhooks (https://www.standardwebhooks.com/)
+  replay_protection: >-
+    A timestamp is included in and covered by the signature, so it cannot be altered without
+    invalidating the signature. Integrators are told to reject payloads whose signature is valid but
+    whose timestamp is too old.
+  secret_scope: One signing secret per endpoint, and different secrets for test and live keys.
+  retries: Each event is retried up to 4 times.
+  failure_definition:
+    - No 2xx HTTP response
+    - Response takes longer than 60 seconds
+    - Connection errors
+  auto_disable: >-
+    Endpoints that repeatedly fail are automatically disabled and the customer is emailed; the
+    endpoint must be re-enabled manually in the portal.
+  handler_requirement: Return 200 before doing any work that could time out; process asynchronously.
+  delivery_log_retention: 15 days
+  see: asyncapi/fasten-health-webhooks.yml
+
+rate_limit_signaling:
+  published: false
+  note: >-
+    Fasten publishes no rate limits, no limit headers and no 429 contract for its own API. The only
+    429 semantics in the documentation run the OTHER direction: in the Bring Your Own Identity flow,
+    the INTEGRATOR's Token Exchange endpoint may return 429 `temporarily_unavailable` with
+    Retry-After to rate-limit Fasten.
+  see: rate-limits/fasten-health-rate-limits.yml
+
+data_formats:
+  request: application/json (application/x-www-form-urlencoded for the identity PAR endpoint)
+  response: application/json
+  bulk_export: application/fhir+ndjson (JSONL)
+  clinical_model: FHIR R4
+  timestamps: RFC 3339 (e.g. consent_expires_at)
+  identifiers: UUIDv4 for org_connection_id, endpoint_id, brand_id, portal_id and webhook event ids
+
+known_divergences:
+  - kind: skill-vs-spec
+    detail: >-
+      The provider-published Agent Skill's "Core API Endpoints" table names three paths that do not
+      exist in the published OpenAPI 1.0.11: `/organization` (spec has GET /bridge/org),
+      `/catalog/search` as GET (spec has POST /bridge/catalog/search), and
+      `/bridge/fhir/ehi-export/{org_connection_id}` for status polling (spec has
+      GET /bridge/fhir/ehi-export/{taskId}). An agent following the skill verbatim would call
+      three URLs that do not resolve. Recorded, not corrected — the skill is saved verbatim.
+    source: skills/fasten-health-fastenhealth-skill.md
+  - kind: docs-vs-spec
+    detail: >-
+      The docs and llms.txt document a "Brand Logo Image" endpoint
+      (/api-reference/catalog/logo) that has no corresponding path in the published OpenAPI.
+    source: https://docs.connect.fastenhealth.com/api-reference/catalog/logo
+
+cross_links:
+  authentication: authentication/fasten-health-authentication.yml
+  scopes: scopes/fasten-health-scopes.yml
+  errors: errors/fasten-health-problem-types.yml
+  lifecycle: lifecycle/fasten-health-lifecycle.yml
+  rate_limits: rate-limits/fasten-health-rate-limits.yml
+  sandbox: sandbox/fasten-health-sandbox.yml
+  webhooks: asyncapi/fasten-health-webhooks.yml

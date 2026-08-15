@@ -1,0 +1,109 @@
+generated: '2026-08-14'
+method: searched
+source: openapi/fasten-health-connect-openapi-original.yml
+docs: https://docs.connect.fastenhealth.com/api-reference/authentication
+note: >-
+  Baseline derived mechanically by 0-working/derive-authentication.py from the published OpenAPI
+  (one scheme: bridge_basic), then upgraded from the provider's authentication and introduction
+  reference pages, which document the key-prefix mode model, the client-side vs server-side key
+  split and the separate OAuth 2.0 identity surface that the spec does not describe at all.
+summary:
+  types: [http, oauth2]
+  http_schemes: [basic]
+  oauth2_flows: [pushed-authorization-request]
+  api_key_in: []
+  spec_declared_types: [http]
+
+schemes:
+  - name: bridge_basic
+    type: http
+    scheme: basic
+    applies_to: Fasten Connect REST API (https://api.connect.fastenhealth.com/v1)
+    username: API Public ID
+    password: API Private Key
+    header: 'Authorization: Basic base64(public_id:private_key)'
+    description: >-
+      Basic Authentication containing an API Public ID and Private Key generated from the Fasten
+      Connect Portal. The docs warn explicitly: do not expose these keys in the browser.
+    sources:
+      - openapi/fasten-health-connect-openapi-original.yml
+      - https://docs.connect.fastenhealth.com/api-reference/authentication
+    key_modes:
+      - {mode: test, role: client-side, prefix: public_test_, secret: false, description: "Test mode key identifying your app."}
+      - {mode: test, role: server-side, prefix: private_test_, secret: true, description: "Test mode authenticated-request key."}
+      - {mode: live, role: client-side, prefix: public_live_, secret: false, description: "Live mode key identifying your app."}
+      - {mode: live, role: server-side, prefix: private_live_, secret: true, description: "Live mode authenticated-request key."}
+    mode_selection: >-
+      The key used determines whether the request runs in live or test mode; there is no mode header
+      or parameter and one server URL serves both.
+    scoping: >-
+      None. A private key is all-or-nothing — there is no scope, permission or least-privilege model
+      for API consumers, and the same credential that reads catalog metadata can request and
+      download a patient's complete medical record.
+    key_management: https://portal.fastenhealth.com
+    operations_requiring_auth: 5
+    operations_public: 7
+    operations_note: >-
+      Only 5 of 12 operations declare security in the spec: GET /bridge/catalog/export,
+      GET /bridge/org_connection/{orgConnectionId}, POST /bridge/vault_connection/revoke,
+      POST /bridge/fhir/ehi-export and GET /bridge/fhir/ehi-export/{taskId}. The download operation
+      GET /bridge/fhir/ehi-export/{taskId}/download/{fileId} declares NO security in the spec, yet
+      the docs and the provider's own Agent Skill both state it requires authentication — a
+      contract/documentation mismatch on the operation that returns PHI.
+
+  - name: fasten-identity-par
+    type: oauth2
+    flow: pushed-authorization-request
+    applies_to: Bring Your Own Identity (BYOI) TEFCA IAS flow
+    spec_declared: false
+    endpoint: POST https://identity.fastenhealth.com/oauth2/par
+    client_authentication: HTTP Basic with the Fasten public ID and private key
+    jwks: https://identity.fastenhealth.com/jwks.json
+    scopes: [openid, profile, email]
+    standards: [RFC 9126, RFC 8693, RFC 7523, OpenID Connect Core 1.0]
+    description: >-
+      A second, OAuth-based authentication surface used only in the BYOI identity-proofing flow.
+      Fasten authenticates ITSELF to the integrator using a signed client assertion JWT
+      (iss https://api.connect.fastenhealth.com, sub = the integrator's stable patient_id, aud = the
+      registered Token Exchange endpoint, with exp/iat/nbf/jti replay constraints), and the
+      integrator returns a CSP-issued OIDC ID Token.
+    mutual: true
+    probe:
+      checked: '2026-08-14'
+      result: identity.fastenhealth.com does not resolve in public DNS (NXDOMAIN).
+    sources:
+      - https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+    see: scopes/fasten-health-scopes.yml
+
+  - name: webhook-signature
+    type: hmac-signature
+    direction: inbound-to-integrator
+    header: Webhook-Signature
+    spec: Standard Webhooks (https://www.standardwebhooks.com/)
+    secret_scope: per endpoint, and different between test and live
+    secret_source: Signing Secret on the endpoint's Delivery Logs page in the Developer Portal
+    replay_protection: signed timestamp inside the signature
+    description: >-
+      Not an API authentication scheme but the third credential an integrator must manage: the
+      shared secret used to verify that a received webhook came from Fasten.
+    sources:
+      - https://docs.connect.fastenhealth.com/webhooks/verification
+    see: asyncapi/fasten-health-webhooks.yml
+
+client_side_credential:
+  field: public-id
+  used_by: Stitch widget (<fasten-stitch-element public-id="...">)
+  safe_in_browser: true
+  note: >-
+    The public ID is designed for browser exposure and identifies the app to the Stitch consent
+    widget. One Stitch quickstart sample shows a `pub_live_` prefix while the API reference
+    documents `public_live_`; the API reference is authoritative.
+
+gaps:
+  - No OAuth or scoped authorization for API consumers — Basic auth with a full-privilege key.
+  - No documented key rotation policy or key expiry.
+  - No MFA/JIT or short-lived credential option for API access (portal login gained 2FA on 2026-08-04).
+  - >-
+    The PHI download operation declares no security requirement in the OpenAPI despite requiring
+    authentication in practice.
+  - No OIDC discovery document is reachable on any Fasten host.

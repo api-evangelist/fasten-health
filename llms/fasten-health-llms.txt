@@ -1,0 +1,54 @@
+# Fasten Connect
+
+## Docs
+
+- [Home](https://docs.connect.fastenhealth.com/home.md): Welcome to the Fasten Connect Docs
+- [Quickstart](https://docs.connect.fastenhealth.com/quickstart.md): Start collecting medical records in under 5 minutes
+- [Changelog](https://docs.connect.fastenhealth.com/changelog.md): Learn about the latest updates to the Fasten Connect service.
+- [Support](https://docs.connect.fastenhealth.com/support.md): How to get support for Fasten Connect
+- [FAQs](https://docs.connect.fastenhealth.com/faqs.md): Frequently Asked Questions
+- [Patient Consent & Data Collection](https://docs.connect.fastenhealth.com/guides/patient-consent-data-collection.md): Understand how Fasten Connect guides patients through consent and how your systems collect the authorized data.
+- [Webhook Debugging & Simulator](https://docs.connect.fastenhealth.com/guides/webhook-debugging-simulator.md)
+- [Caching Strategy](https://docs.connect.fastenhealth.com/guides/caching-strategy.md): Understand how Fasten Connect caches retrieved records and how the cache lifecycle works.
+- [Test Data Sources](https://docs.connect.fastenhealth.com/guides/test-data.md)
+- [Contribute Catalog Updates](https://docs.connect.fastenhealth.com/guides/catalog-editor.md): How Fasten customers can use the Fasten Toolbox to request provider catalog corrections.
+- [Display & Component Library](https://docs.connect.fastenhealth.com/guides/display-component-library.md): Render and customize FHIR resources in your frontend with fhir-react or extract individual fields with fhirpath.js.
+- [Test Patient Credentials](https://docs.connect.fastenhealth.com/guides/test-patient-credentials.md): Use pre-configured sandbox logins to explore EHR portals in test mode and validate your Fasten Stitch experience.
+- [TEFCA IAS Developer Guide](https://docs.connect.fastenhealth.com/guides/tefca-ias.md): Learn about TEFCA IAS mode, its flow, and how to test with example patients.
+- [Introduction](https://docs.connect.fastenhealth.com/api-reference/introduction.md): Documentation for the Fasten Connect API
+- [Authentication](https://docs.connect.fastenhealth.com/api-reference/authentication.md): Documentation for the Fasten Connect API
+- [Initiate Connection](https://docs.connect.fastenhealth.com/api-reference/registration/connect.md): This endpoint will generate a state value and redirect the user to their healthcare provider Patient Portal to authenticate with the healthcare provider's EHR.
+- [Reconnect existing Connection](https://docs.connect.fastenhealth.com/api-reference/registration/reconnect.md): This endpoint is used to reconnect an existing patient authorization with their healthcare provider's Patient Portal.  It generates a state value and redirects the user to the Patient Portal for re-authentication with the provider's EHR system. This endpoint is only required if the existing connecti…
+- [Bulk Records Request](https://docs.connect.fastenhealth.com/api-reference/ehi_export/create.md): <Note> This endpoint is idempotent. If a request with the same `org_connection_id` has already been registered, it will return the existing request. </Note>
+- [Get Request Status](https://docs.connect.fastenhealth.com/api-reference/ehi_export/get.md): Check the status of the EHI Export Task.
+- [Download Bulk Records](https://docs.connect.fastenhealth.com/api-reference/ehi_export/download.md): When provided with a `taskId` and `fileId`, this endpoint will return a signed URL to download the file in the `Location` header. Your http client should be able to follow the redirect and download the file.
+- [Get Organization](https://docs.connect.fastenhealth.com/api-reference/organization/get.md): Get information about your organization. This is used to display branding information in the Stitch.js popup widget.
+- [Get Organization Connection](https://docs.connect.fastenhealth.com/api-reference/organization_connection/get.md): Check the status of an existing organization connection.          <Warning> This endpoint requires an API public id & private key for authentication. Do not expose these keys in the browser. </Warning>
+- [Get Catalog Entry](https://docs.connect.fastenhealth.com/api-reference/catalog/get.md): Get branding & metadata information associated with healthcare institutions supported by Fasten Connect.
+- [Search Catalog Brands](https://docs.connect.fastenhealth.com/api-reference/catalog/search.md): Search for healthcare institutions supported by Fasten Connect.
+- [Bulk Catalog Export](https://docs.connect.fastenhealth.com/api-reference/catalog/export.md): Retrieve download links for the entire Fasten Connect catalog in one request.
+- [Brand Logo Image](https://docs.connect.fastenhealth.com/api-reference/catalog/logo.md): This endpoint allows you to retrieve the logo image of a healthcare institution.
+- [Reset Synthetic Patient](https://docs.connect.fastenhealth.com/api-reference/revoke/tefca_revoke.md): Run this command to reset a TEFCA synthetic test patient's connections.
+- [Support Request](https://docs.connect.fastenhealth.com/api-reference/support/request.md): File a support ticket with the Fasten team using our API.
+- [Introduction](https://docs.connect.fastenhealth.com/stitch/v4/introduction.md): Overview of the Stitch SDKs for embedding Fasten Connect experiences in Web, React, React Native, and future runtimes.
+- [Quickstart](https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/quickstart.md): Install and render the `<fasten-stitch-element>` inside any web runtime.
+- [Reference](https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/reference.md): Configuration options, events, and styling guidance for the Stitch Web Component.
+- [Quickstart](https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/quickstart.md): Install the Stitch React SDK and launch the Fasten Connect modal from React web apps.
+- [Reference](https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/reference.md): Configuration options, events, refs, and styling guidance for the Stitch React SDK.
+- [Quickstart](https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/quickstart.md): Install the Stitch React Native SDK and launch the Fasten Connect modal from iOS and Android apps.
+- [Reference](https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/reference.md): Configuration options, events, and styling guidance for the Stitch React Native SDK
+- [Client Events](https://docs.connect.fastenhealth.com/stitch/v4/client-events.md): Events generated by the Fasten Stitch SDKs.
+- [Introduction](https://docs.connect.fastenhealth.com/webhooks/introduction.md): Use Webhooks to listen to events from Fasten Connect, rather than polling the API.
+- [Event Types](https://docs.connect.fastenhealth.com/webhooks/events.md): There are multiple event types that can be emitted by Fasten Connect.
+- [Delivery](https://docs.connect.fastenhealth.com/webhooks/delivery.md): This section helps you understand different behaviors of Fasten Connect webhook delivery & provides some best practices.
+- [Verification](https://docs.connect.fastenhealth.com/webhooks/verification.md): Verify webhook signatures to confirm that received events are sent from Fasten Connect
+- [Introduction](https://docs.connect.fastenhealth.com/identity-proofing/introduction.md): Learn when identity proofing is required, why it helps protect healthcare data, and what patients should expect.
+- [Bring Your Own Identity](https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity.md): Use your own AAL2 authentication and CSP identity-proofing flow with Fasten Connect and TEFCA IAS.
+
+## OpenAPI Specs
+
+- [openapi](https://docs.connect.fastenhealth.com/api-reference/openapi.yaml)
+
+## Optional
+
+- [Blog](https://blog.fastenhealth.com)

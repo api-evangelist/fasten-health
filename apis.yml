@@ -38,7 +38,7 @@ tags:
 - HL7
 - Healthcare Connectivity
 created: '2026-05-25'
-modified: '2026-05-25'
+modified: '2026-08-14'
 url: https://raw.githubusercontent.com/api-evangelist/fasten-health/refs/heads/main/apis.yml
 specificationVersion: '0.19'
 x-type: opensource
@@ -52,7 +52,10 @@ apis:
     or by importing FHIR Bundles. It ships condition-specific dashboards and diagnostic test tracking, with
     planned vaccination-recommendation, conversational medical-history, and wearable-integration features.
     Distributed under GPL-3.0 with 2.7k+ stars; the official container image is hosted at
-    ghcr.io/fastenhealth/fasten-onprem.
+    ghcr.io/fastenhealth/fasten-onprem. STATUS - the repository was ARCHIVED (read-only) on GitHub as
+    verified on 2026-08-14; last push 2026-02-13 and last tagged release v1.1.3 on 2024-10-01. The
+    self-hosted product line is no longer under active development; Fasten's active work is the
+    commercial Fasten Connect platform.
   humanURL: https://github.com/fastenhealth/fasten-onprem
   tags:
   - Personal Health Record
@@ -102,12 +105,19 @@ apis:
     url: https://docs.connect.fastenhealth.com/api-reference/introduction
   - type: OpenAPI
     url: https://docs.connect.fastenhealth.com/api-reference/openapi.yaml
+  - type: OpenAPI
+    url: openapi/fasten-health-connect-openapi-original.yml
+    name: Fasten Connect OpenAPI 3.0.1 (harvested verbatim, info.version 1.0.11)
+  - type: Overlay
+    url: overlays/fasten-health-connect-overlay.yaml
+  - type: APIReference
+    url: https://docs.connect.fastenhealth.com/api-reference/introduction
   - type: Authentication
     url: https://docs.connect.fastenhealth.com/api-reference/authentication
   - type: GettingStarted
     url: https://docs.connect.fastenhealth.com/quickstart
   - type: Signup
-    url: https://portal.connect.fastenhealth.com
+    url: https://portal.fastenhealth.com
     name: Fasten Connect Developer Portal
   - type: Sandbox
     url: https://docs.connect.fastenhealth.com/guides/test-data
@@ -127,6 +137,9 @@ apis:
   properties:
   - type: Documentation
     url: https://docs.connect.fastenhealth.com/webhooks/introduction
+  - type: Webhooks
+    url: asyncapi/fasten-health-webhooks.yml
+    name: Fasten Connect webhook catalog (7 event types)
   - type: Events
     url: https://docs.connect.fastenhealth.com/webhooks/events
   - type: Delivery
@@ -176,8 +189,13 @@ apis:
   - type: Examples
     url: https://github.com/fastenhealth/react-native-playground
     name: React Native Playground
+  - type: SourceCode
+    url: https://github.com/fastenhealth/fasten-stitch-element-flutter
+    name: fasten-stitch-element-flutter (ALPHA, not published to pub.dev)
   - type: Events
     url: https://docs.connect.fastenhealth.com/stitch/v4/client-events
+  - type: Components
+    url: components/fasten-health-components.yml
 - aid: fasten-health:fasten-identity-proofing
   name: Fasten Identity Proofing & TEFCA IAS
   description: Identity proofing endpoints and guides cover Fasten-issued identity verification as well as a
@@ -203,6 +221,16 @@ apis:
   - type: Documentation
     url: https://docs.connect.fastenhealth.com/guides/tefca-ias
     name: TEFCA IAS Developer Guide
+  - type: OAuthScopes
+    url: scopes/fasten-health-scopes.yml
+  - type: Authentication
+    url: authentication/fasten-health-authentication.yml
+  - type: Endpoint
+    url: https://identity.fastenhealth.com/oauth2/par
+    name: >-
+      Documented OAuth 2.0 PAR endpoint (RFC 9126). NOTE - identity.fastenhealth.com did not
+      resolve in public DNS (NXDOMAIN) when probed on 2026-08-14; recorded as documented, not
+      as independently reachable.
 - aid: fasten-health:gofhir-models
   name: gofhir-models
   description: Apache 2.0 licensed Go client library and generated FHIR resource models used by Fasten's
@@ -297,6 +325,10 @@ apis:
     url: https://github.com/fastenhealth/fasten-answers-ai/blob/main/LICENSE
     name: GPL-3.0
 common:
+- type: AgenticAccess
+  url: agentic-access/fasten-health-agentic-access.yml
+- type: Authentication
+  url: authentication/fasten-health-authentication.yml
 - type: ContributionGuide
   url: https://github.com/fastenhealth/fasten-onprem/blob/main/CONTRIBUTING.md
 - type: DomainSecurity
@@ -338,9 +370,82 @@ common:
   url: https://github.com/fastenhealth/fooclinic
   name: fooclinic Demo Medical Clinic
 - type: Status
-  url: https://docs.connect.fastenhealth.com/support
+  url: https://status.fastenhealth.com/
+- type: StatusPage
+  url: https://status.fastenhealth.com/
 - type: Careers
   url: https://wellfound.com/company/fasten-health
+- type: DeveloperPortal
+  url: https://portal.fastenhealth.com
+  name: Fasten Connect Developer Portal
+- type: APIReference
+  url: https://docs.connect.fastenhealth.com/api-reference/introduction
+- type: GettingStarted
+  url: https://docs.connect.fastenhealth.com/quickstart
+- type: SignUp
+  url: https://portal.fastenhealth.com
+- type: GitHubOrganization
+  url: https://github.com/fastenhealth
+- type: TermsOfService
+  url: https://policy.fastenhealth.com/terms.html
+- type: PrivacyPolicy
+  url: https://policy.fastenhealth.com/connect/privacy_policy.html
+- type: AgentCard
+  url: a2a/fasten-health-a2a.yml
+  name: A2A agent card served at docs.connect.fastenhealth.com (graded near-conformant)
+- type: AgentSkill
+  url: skills/_index.yml
+  name: Provider-published Agent Skill (saved verbatim)
+- type: LLMsTxt
+  url: llms/fasten-health-llms.txt
+- type: WellKnown
+  url: well-known/fasten-health-well-known.yml
+- type: Packages
+  url: packages/fasten-health-packages.yml
+- type: SDKs
+  url: packages/fasten-health-packages.yml
+  name: Stitch client SDKs (npm) + Go libraries
+- type: Conventions
+  url: conventions/fasten-health-conventions.yml
+- type: Idempotency
+  url: conventions/fasten-health-conventions.yml
+  name: Natural-key idempotency on org_connection_id (POST /bridge/fhir/ehi-export)
+- type: ErrorCatalog
+  url: errors/fasten-health-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/fasten-health-lifecycle.yml
+- type: ChangeLog
+  url: changelog/fasten-health-changelog.yml
+  name: Structured changelog (72 dated entries, 2024-09-30..2026-08-04)
+- type: Conformance
+  url: conformance/fasten-health-conformance.yml
+- type: Compliance
+  url: https://trust.fastenhealth.com/
+  name: SOC 2 + HIPAA, CARIN Alliance Code of Conduct signatory
+- type: TrustCenter
+  url: security/fasten-health-trust-center.yml
+- type: Sandbox
+  url: sandbox/fasten-health-sandbox.yml
+  name: FooClinic sandbox, TEFCA C-CDA fixtures, test/live key modes
+- type: DataModel
+  url: data-model/fasten-health-data-model.yml
+- type: Components
+  url: components/fasten-health-components.yml
+- type: OAuthScopes
+  url: scopes/fasten-health-scopes.yml
+- type: Plans
+  url: plans/fasten-health-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/fasten-health-rate-limits.yml
+- type: Webhooks
+  url: asyncapi/fasten-health-webhooks.yml
+- type: Overlay
+  url: overlays/fasten-health-connect-overlay.yaml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-14'
+  status: enriched
+  artifacts_added: 25
+  pass: local-v1

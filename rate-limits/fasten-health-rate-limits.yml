@@ -1,0 +1,62 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  https://docs.connect.fastenhealth.com/api-reference/introduction,
+  https://docs.connect.fastenhealth.com/faqs,
+  https://docs.connect.fastenhealth.com/webhooks/delivery,
+  https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity,
+  openapi/fasten-health-connect-openapi-original.yml
+limit_count: 0
+note: >-
+  Fasten Connect publishes no rate limits for its own API: no per-key, per-account or per-endpoint
+  quota, no window, no burst allowance, no X-RateLimit-*/RateLimit-* response headers, no
+  Retry-After contract and no 429 response anywhere. The published OpenAPI 1.0.11 declares only 200
+  and 302 responses across all 12 operations, so there is no exhaustion status code in the contract
+  either. An agent integrating Fasten has no runtime signal telling it to back off.
+limits: []
+response_headers: []
+exhaustion_status: null
+
+inverted_rate_limiting:
+  note: >-
+    The only 429 semantics Fasten documents run the OTHER direction — the INTEGRATOR rate-limits
+    Fasten, not the reverse.
+  context: Bring Your Own Identity — Customer Token Exchange endpoint
+  contract:
+    status: 429
+    error: temporarily_unavailable
+    header: Retry-After
+    description: >-
+      "The endpoint is rate limiting Fasten. Include Retry-After." Fasten may retry temporary
+      failures and rate-limited requests, and asks integrators to use Retry-After with
+      429 Too Many Requests or 503 Service Unavailable to delay the next attempt.
+  source: https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+
+adjacent_throttling_controls:
+  - control: Server-side response cache
+    detail: >-
+      Records retrieved for a connection_id are cached for 24 hours and repeat requests are served
+      from cache, which suppresses redundant upstream calls. This is a caching policy, not a
+      published quota, and there is no documented cache-bypass parameter.
+    source: https://docs.connect.fastenhealth.com/guides/caching-strategy
+  - control: Webhook delivery retry ceiling
+    detail: >-
+      Outbound webhook events are retried up to 4 times; an endpoint is auto-disabled after repeated
+      failure. A failure is a non-2xx response, a response slower than 60 seconds, or a connection
+      error.
+    source: https://docs.connect.fastenhealth.com/webhooks/delivery
+  - control: Signed download URL expiry
+    detail: EHI export download links are valid for 10 minutes; exports are deleted after 24 hours.
+    source: skills/fasten-health-fastenhealth-skill.md
+  - control: PAR request_uri expiry
+    detail: The identity PAR request_uri is single-use and expires after 90 seconds.
+    source: https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+
+upstream_note: >-
+  The FAQ warns that some EHR and payer SANDBOXES are "heavily rate limited". That is a property of
+  third-party health-system sandboxes reached through Fasten, not of the Fasten Connect API.
+
+evidence:
+  - {url: 'https://docs.connect.fastenhealth.com/api-reference/introduction', status: 200, note: 'No rate-limit section.'}
+  - {url: 'https://docs.connect.fastenhealth.com/llms.txt', status: 200, note: 'No rate-limit page in the 44-page documentation index.'}
+  - {url: 'https://docs.connect.fastenhealth.com/api-reference/openapi.yaml', status: 200, note: 'No 429 response on any of the 12 operations.'}

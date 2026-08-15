@@ -1,0 +1,49 @@
+generated: '2026-08-14'
+method: searched
+source: https://www.fastenhealth.com/
+plan_count: 0
+pricing_model: contact-sales
+note: >-
+  Fasten Health publishes NO pricing. The marketing site's own navigation links to /pricing, but
+  that URL returns HTTP 404 and renders the site's "Page Not Found" view — a broken link, not a
+  gated page. Every commercial path terminates in "Book a Demo" or "Enterprise Solutions — Custom,
+  Tailored to your needs". No tier names, no unit price, no included quota, no overage rate and no
+  machine-readable pricing or catalog endpoint exists anywhere on the site or in the API.
+plans: []
+commercial_signals:
+  - signal: Free developer sandbox
+    detail: >-
+      The homepage advertises a "Free developer sandbox — test without commitment". Test-mode keys
+      are self-service from the Developer Portal, so evaluation is free and ungated, but no free
+      or paid TIER is named.
+    source: https://www.fastenhealth.com/
+  - signal: Upgraded plans exist
+    detail: >-
+      The support page states that SLAs and BAAs are "available for customers on upgraded plans",
+      confirming a tiered commercial structure that is not published.
+    source: https://docs.connect.fastenhealth.com/support
+  - signal: TEFCA IAS carries additional fees
+    detail: >-
+      "There are additional fees involved with TEFCA IAS in `live` mode. Please contact
+      support@fastenhealth.com or your Account Representative for more information." The amount is
+      not stated.
+    source: https://docs.connect.fastenhealth.com/identity-proofing/bring-your-own-identity
+  - signal: Billing identifier
+    detail: >-
+      Support and FAQ pages ask for `organization_id`, "your customer identifier — this helps us
+      debug billing, payment and webhook-related issues", confirming metered/invoiced accounts.
+    source: https://docs.connect.fastenhealth.com/support
+  - signal: Optional export formats are commercially gated
+    detail: >-
+      Export formats beyond the default JSONL "can be enabled by contacting Fasten support",
+      indicating per-account feature enablement rather than a published plan matrix.
+    source: https://docs.connect.fastenhealth.com/webhooks/events
+contact:
+  demo: https://www.fastenhealth.com/
+  sales_email: support@fastenhealth.com
+  account_rep_booking: https://calendly.com/jason-kulatunga/30min
+  signup: https://portal.fastenhealth.com
+evidence:
+  - {url: 'https://www.fastenhealth.com/pricing', status: 404, note: 'Linked from site nav; renders "Page Not Found".'}
+  - {url: 'https://www.fastenhealth.com/', status: 200, note: 'CTA is "Book a Demo" / "Enterprise Solutions"; no prices.'}
+  - {url: 'https://docs.connect.fastenhealth.com/support', status: 200, note: 'References "upgraded plans" without naming them.'}

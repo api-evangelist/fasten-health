@@ -1,0 +1,159 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  registry.npmjs.org, proxy.golang.org, pypi.org, pub.dev, api.github.com/orgs/fastenhealth and the
+  Fasten Connect Stitch SDK quickstart pages
+note: >-
+  Fasten Health ships client libraries in two shapes: npm-published Stitch SDKs for the patient
+  consent widget, and Go modules for its open-source FHIR/PDF libraries. There is no first-party
+  server-side SDK for the Fasten Connect REST API itself in any language — integrators are expected
+  to call it directly with HTTP Basic auth (the authentication docs give raw cURL/Go/JS/Python/Java
+  snippets rather than an SDK).
+packages:
+  - language: javascript
+    registry: npm
+    name: "@fastenhealth/fasten-stitch-element-react"
+    url: https://www.npmjs.com/package/@fastenhealth/fasten-stitch-element-react
+    install: npm install @fastenhealth/fasten-stitch-element-react
+    official: true
+    license: MIT
+    version: 1.0.4
+    published: '2026-06-25'
+    repository: https://github.com/fastenhealth/fasten-stitch-element-react
+    release_count: 4
+    docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react/quickstart
+    description: React SDK for Fasten Connect — embed health data connections in any React web application.
+
+  - language: javascript
+    registry: npm
+    name: "@fastenhealth/fasten-stitch-element-react-native"
+    url: https://www.npmjs.com/package/@fastenhealth/fasten-stitch-element-react-native
+    install: npm install @fastenhealth/fasten-stitch-element-react-native react-native-webview
+    official: true
+    license: MIT
+    version: 1.0.6
+    published: '2026-07-31'
+    repository: https://github.com/fastenhealth/fasten-stitch-element-react-native
+    release_count: 5
+    docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/react-native/quickstart
+    description: React Native SDK for Fasten Connect; wraps the Stitch widget in a WebView modal.
+    note: >-
+      The React Native quickstart's own code samples import from `fasten-connect-stitch-react-native`,
+      a package name that does not exist on npm (404). The installable package is the scoped
+      `@fastenhealth/...` name shown in the install command on the same page.
+
+  - language: javascript
+    registry: cdn
+    name: fasten-stitch-element (Stitch.js v4 Web Component)
+    url: https://cdn.fastenhealth.com/connect/v4/fasten-stitch-element.js
+    css: https://cdn.fastenhealth.com/connect/v4/fasten-stitch-element.css
+    install: '<script src="https://cdn.fastenhealth.com/connect/v4/fasten-stitch-element.js" type="module"></script>'
+    official: true
+    version: null
+    published: null
+    http_status: 200
+    docs: https://docs.connect.fastenhealth.com/stitch/v4/sdks/web-component/quickstart
+    note: >-
+      CDN-distributed, not published to any package registry, and UNPINNED — the documented URL
+      floats at the `/connect/v4/` major-version path, so there is no version or release date to
+      read from the URL and no registry metadata endpoint to query. A consumer cannot tell which
+      build they are loading, and neither can we. Recorded as null after checking, not unchecked.
+      Served from CloudFront (cdn.fastenhealth.com -> daj7sc8ftenfz.cloudfront.net).
+
+  - language: dart
+    registry: null
+    name: fasten-stitch-element-flutter
+    url: https://github.com/fastenhealth/fasten-stitch-element-flutter
+    official: true
+    license: MIT
+    version: null
+    published: null
+    source_last_push: '2026-08-08'
+    status: alpha
+    note: >-
+      Fourth Stitch SDK target. The repository describes itself as "[ALPHA] Work-in-progress" and is
+      NOT published to pub.dev (pub.dev/api/packages/fasten_stitch_element returns 404), so there is
+      no released version or publication date to record. Source-only at this time; it is also not
+      yet referenced from the Stitch SDK documentation, which covers Web Component, React and
+      React Native only.
+
+  - language: go
+    registry: go-modules
+    name: github.com/fastenhealth/gofhir-models
+    url: https://pkg.go.dev/github.com/fastenhealth/gofhir-models
+    install: go get github.com/fastenhealth/gofhir-models
+    official: true
+    license: Apache-2.0
+    version: v0.1.1
+    published: '2026-06-18'
+    repository: https://github.com/fastenhealth/gofhir-models
+    description: Generated Go structs and client helpers for FHIR R4 resources, used by Fasten's own services.
+
+  - language: go
+    registry: go-modules
+    name: github.com/fastenhealth/folio
+    url: https://pkg.go.dev/github.com/fastenhealth/folio
+    install: go get github.com/fastenhealth/folio
+    official: true
+    license: Apache-2.0
+    version: v0.0.0-20260503191122-f9831e9bbb48
+    published: '2026-05-03'
+    repository: https://github.com/fastenhealth/folio
+    description: >-
+      Modern PDF library for Go — layout engine, HTML-to-PDF, form fill, digital signatures, barcodes.
+      Open-sourced by Fasten to power patient-facing medical record exports.
+    note: >-
+      No tagged release. The module proxy serves only a pseudo-version derived from a commit, so
+      consumers cannot pin to a semantic version.
+
+  - language: go
+    registry: go-modules
+    name: github.com/fastenhealth/fasten-onprem
+    url: https://pkg.go.dev/github.com/fastenhealth/fasten-onprem
+    official: true
+    license: GPL-3.0
+    version: v1.1.3
+    published: '2024-10-01'
+    repository: https://github.com/fastenhealth/fasten-onprem
+    container: ghcr.io/fastenhealth/fasten-onprem
+    status: archived
+    note: >-
+      DECAY SIGNAL. The flagship open-source product (2,795 stars) is ARCHIVED on GitHub as of the
+      2026-08-14 check, last pushed 2026-02-13, and its last tagged release v1.1.3 dates to
+      2024-10-01 — roughly 22 months before this pass. See lifecycle/fasten-health-lifecycle.yml.
+
+third_party:
+  - language: javascript
+    registry: npm
+    name: fhir-react
+    url: https://www.npmjs.com/package/fhir-react
+    official: false
+    license: MIT
+    version: 2.1.1
+    published: '2026-04-20'
+    repository: https://github.com/1uphealth/fhir-react
+    note: >-
+      Recommended by Fasten's Display & Component Library guide and forked into the Fasten GitHub
+      org at github.com/fastenhealth/fhir-react, but the PUBLISHED npm package's repository and
+      homepage both point at 1uphealth/fhir-react. It is a third-party library Fasten consumes and
+      recommends, not a Fasten-published SDK. Marked official:false on that evidence.
+
+  - language: javascript
+    registry: npm
+    name: standardwebhooks
+    url: https://www.npmjs.com/package/standardwebhooks
+    official: false
+    note: >-
+      Fasten's webhook verification docs instruct integrators to use any Standard Webhooks
+      implementation (JS/Go/Python/Ruby/Java) rather than shipping a first-party verification SDK.
+
+registries_checked:
+  - {registry: npm, result: 2 first-party packages found}
+  - {registry: go-modules, result: 3 first-party modules found}
+  - {registry: pypi, result: none — "fasten" on PyPI is an unrelated plug-in interface library}
+  - {registry: pub.dev, result: none — Flutter SDK is source-only}
+  - {registry: rubygems, result: none}
+  - {registry: crates.io, result: none}
+  - {registry: nuget, result: none}
+  - {registry: maven-central, result: none}
+  - {registry: packagist, result: none}

@@ -1,0 +1,55 @@
+generated: '2026-08-14'
+method: searched
+probe: true
+probe_result: >-
+  0-working/probe-security-programs.py returned "trust=none" for this provider. That is a false
+  negative caused by rendering, not an absence: trust.fastenhealth.com answers HTTP 200 with an
+  814-byte single-page-app shell that loads its content from
+  laika-app-prod.s3.amazonaws.com/static/trust-center/assets/index.js, so the keyword check found
+  no trust/compliance terms in the served HTML. The certifications below are taken from the
+  company's own marketing site, which states them in server-rendered text.
+url: https://trust.fastenhealth.com/
+platform: Laika / Thoropass Trust Center
+http_status: 200
+certifications:
+  - SOC 2
+  - HIPAA
+commitments:
+  - {name: CARIN Alliance Code of Conduct, role: Signatory}
+  - {name: CMS Interoperability Framework, role: Pledged}
+agreements:
+  - {name: Business Associate Agreement (BAA), availability: Customers on upgraded plans}
+  - {name: Service Level Agreement (SLA), availability: Customers on upgraded plans}
+claims_verbatim:
+  - "SOC2 & HIPAA-compliant — Enterprise-grade security"
+  - "SOC2 Certified"
+  - "Protected Health Information"
+  - "Carin Alliance Code of Conduct Signatory"
+evidence:
+  - source: https://www.fastenhealth.com/
+    http_status: 200
+    kind: marketing-site-server-rendered-text
+    keywords: [SOC2 Certified, HIPAA-compliant, Protected Health Information, Carin Alliance Code of Conduct Signatory]
+  - source: https://www.fastenhealth.com/images/logos/thoropass-soc2.png
+    kind: auditor-badge
+    note: Thoropass SOC 2 badge referenced from the homepage.
+  - source: https://trust.fastenhealth.com/
+    http_status: 200
+    kind: trust-center
+    note: >-
+      JS-rendered Laika trust center. Reachable but machine-unreadable — the certification detail,
+      report request flow and subprocessor list are not in the served HTML.
+  - source: https://docs.connect.fastenhealth.com/support
+    http_status: 200
+    kind: docs
+    keywords: [Service Level Agreements, Business Associate Agreements]
+policies:
+  terms_of_service: https://policy.fastenhealth.com/terms.html
+  privacy_policy: https://policy.fastenhealth.com/connect/privacy_policy.html
+  policy_repo: https://github.com/fastenhealth/policy
+gaps:
+  - No security.txt on any host (RFC 9116).
+  - No published vulnerability disclosure policy or bug bounty program found.
+  - >-
+    The trust center is a client-rendered SPA, so no certification, subprocessor or report metadata
+    is machine-readable; an agent or crawler evaluating Fasten's compliance posture sees nothing.

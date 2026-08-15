@@ -1,0 +1,118 @@
+generated: '2026-08-14'
+method: probed
+source: live GET of /.well-known/* on every Fasten Health host in apis.yml + OpenAPI servers[]
+summary: >-
+  One real document is served across the whole /.well-known/ surface: an A2A agent card on the
+  documentation host. No security.txt, no OIDC/OAuth discovery, no api-catalog and no ai-plugin
+  manifest is published on any host. api.connect.fastenhealth.com rejects every unauthenticated
+  /.well-known/* request with 403, so its discovery surface cannot be read anonymously.
+hosts:
+  - host: https://docs.connect.fastenhealth.com
+    documents:
+      - path: /.well-known/agent-card.json
+        status: 200
+        content_type: application/json
+        file: ../a2a/fasten-health-agent-card.json
+        note: Real A2A agent card; saved verbatim under a2a/ and graded there.
+      - path: /.well-known/agent-skills/fastenhealth/skill.md
+        status: 200
+        content_type: text/markdown
+        file: ../skills/fasten-health-fastenhealth-skill.md
+        note: >-
+          Provider-published Agent Skill referenced by the agent card. Saved verbatim under skills/.
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+        note: Returns the docs 404 HTML page, not a document.
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://api.connect.fastenhealth.com
+    note: >-
+      Every /.well-known/* path returns HTTP 403 with a 23-byte JSON body. The API host refuses
+      anonymous discovery entirely; absence cannot be distinguished from access denial here.
+    documents:
+      - path: /.well-known/security.txt
+        status: 403
+      - path: /.well-known/openid-configuration
+        status: 403
+      - path: /.well-known/oauth-authorization-server
+        status: 403
+      - path: /.well-known/oauth-protected-resource
+        status: 403
+      - path: /.well-known/api-catalog
+        status: 403
+      - path: /.well-known/ai-plugin.json
+        status: 403
+      - path: /.well-known/agent-card.json
+        status: 403
+      - path: /.well-known/agent.json
+        status: 403
+  - host: https://www.fastenhealth.com
+    note: All paths return the marketing site's 404 HTML page (49,612 bytes). No documents served.
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://portal.fastenhealth.com
+    note: >-
+      The developer portal is a single-page app. GET /.well-known/openid-configuration returns
+      HTTP 200 with the SPA HTML shell (9,988 bytes, text/html) — a catch-all route, NOT an OIDC
+      discovery document. Recorded as a miss.
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        content_type: text/html
+        document: false
+        note: SPA catch-all HTML shell, not a discovery document.
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://identity.fastenhealth.com
+    note: >-
+      Documented in the Bring Your Own Identity guide as the OAuth 2.0 PAR / JWKS host
+      (POST /oauth2/par, GET /jwks.json), but the hostname does not resolve in public DNS
+      (NXDOMAIN), so no probe could connect. Recorded as unreachable, not as absent.
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 0
+        error: dns-nxdomain
+      - path: /.well-known/oauth-authorization-server
+        status: 0
+        error: dns-nxdomain
+      - path: /jwks.json
+        status: 0
+        error: dns-nxdomain
+  - host: https://blog.fastenhealth.com
+    note: All paths return the blog's 404 HTML page. No documents served.
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
