@@ -40,7 +40,7 @@ tags:
 created: '2026-05-25'
 modified: '2026-08-14'
 url: https://raw.githubusercontent.com/api-evangelist/fasten-health/refs/heads/main/apis.yml
-specificationVersion: '0.19'
+specificationVersion: '0.23'
 x-type: opensource
 x-tier: 1
 apis:
