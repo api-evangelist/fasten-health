@@ -34,6 +34,19 @@ tags:
 - EHI Export
 - Patient Consent
 - Self-Hosted
+- Open-Source
+- HL7
+- Healthcare Connectivity
+tags_raw:
+- Healthcare
+- FHIR
+- Personal Health Record
+- Electronic Medical Record
+- Health Data Interoperability
+- TEFCA
+- EHI Export
+- Patient Consent
+- Self-Hosted
 - Open Source
 - HL7
 - Healthcare Connectivity
@@ -58,6 +71,13 @@ apis:
     commercial Fasten Connect platform.
   humanURL: https://github.com/fastenhealth/fasten-onprem
   tags:
+  - Personal Health Record
+  - Electronic Medical Record
+  - Self-Hosted
+  - FHIR
+  - Family Health
+  - Open-Source
+  tags_raw:
   - Personal Health Record
   - Electronic Medical Record
   - Self-Hosted
@@ -131,6 +151,10 @@ apis:
     debugging simulator for local development.
   humanURL: https://docs.connect.fastenhealth.com/webhooks/introduction
   tags:
+  - Webhook
+  - Event-Driven
+  - Async
+  tags_raw:
   - Webhooks
   - Event-Driven
   - Async
