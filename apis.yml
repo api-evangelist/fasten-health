@@ -59,16 +59,16 @@ x-tier: 1
 apis:
 - aid: fasten-health:fasten-onprem
   name: Fasten OnPrem
-  description: Fasten OnPrem is an open-source, self-hosted, personal and family electronic medical record
-    manager written in Go (47%) and TypeScript (35%). It runs as a Docker container behind HTTPS/TLS, supports
-    multi-user family accounts with admin and viewer roles, and ingests medical data either through manual entry
-    or by importing FHIR Bundles. It ships condition-specific dashboards and diagnostic test tracking, with
-    planned vaccination-recommendation, conversational medical-history, and wearable-integration features.
-    Distributed under GPL-3.0 with 2.7k+ stars; the official container image is hosted at
-    ghcr.io/fastenhealth/fasten-onprem. STATUS - the repository was ARCHIVED (read-only) on GitHub as
-    verified on 2026-08-14; last push 2026-02-13 and last tagged release v1.1.3 on 2024-10-01. The
-    self-hosted product line is no longer under active development; Fasten's active work is the
-    commercial Fasten Connect platform.
+  description: >-
+    Fasten OnPrem is an open-source, self-hosted, personal and family electronic medical record manager
+    written in Go (47%) and TypeScript (35%). It runs as a Docker container behind HTTPS/TLS, supports
+    multi-user family accounts with admin and viewer roles, and ingests medical data either through manual
+    entry or by importing FHIR Bundles. It ships condition-specific dashboards and diagnostic test tracking,
+    with planned vaccination-recommendation, conversational medical-history, and wearable-integration
+    features. Distributed under GPL-3.0 with 2.7k+ stars; the official container image is hosted at ghcr.io/fastenhealth/fasten-onprem.
+    STATUS - the repository was ARCHIVED (read-only) on GitHub as verified on 2026-08-14; last push 2026-02-13
+    and last tagged release v1.1.3 on 2024-10-01. The self-hosted product line is no longer under active
+    development; Fasten's active work is the commercial Fasten Connect platform.
   humanURL: https://github.com/fastenhealth/fasten-onprem
   tags:
   - Personal Health Record
@@ -101,54 +101,13 @@ apis:
     url: https://github.com/fastenhealth/fasten-onprem/releases
   - type: GettingStarted
     url: https://github.com/fastenhealth/fasten-onprem#install-instructions
-- aid: fasten-health:fasten-connect
-  name: Fasten Connect API
-  description: Fasten Connect is the commercial REST + FHIR API for retrieving patient clinical records from
-    50,000+ U.S. healthcare systems. The API surface is documented in OpenAPI 1.0.11 at
-    api.connect.fastenhealth.com/v1 and uses HTTP Basic authentication with public/private key pairs prefixed
-    public_test_/private_test_ or public_live_/private_live_. Capabilities include catalog discovery (search
-    brands, fetch organization metadata, brand logos, bulk catalog export), patient-to-provider connection
-    orchestration via the /bridge/connect and /bridge/reconnect endpoints, organization-connection status checks,
-    bulk EHI (Electronic Health Information) export requests with task polling and signed downloads, TEFCA
-    synthetic-patient revocation for testing, and a support-ticket endpoint.
-  humanURL: https://docs.connect.fastenhealth.com/api-reference/introduction
-  baseURL: https://api.connect.fastenhealth.com/v1
-  tags:
-  - FHIR
-  - Healthcare Connectivity
-  - EHI Export
-  - TEFCA
-  - REST
-  - Patient Records
-  properties:
-  - type: Documentation
-    url: https://docs.connect.fastenhealth.com/api-reference/introduction
-  - type: OpenAPI
-    url: https://docs.connect.fastenhealth.com/api-reference/openapi.yaml
-  - type: OpenAPI
-    url: openapi/fasten-health-connect-openapi-original.yml
-    name: Fasten Connect OpenAPI 3.0.1 (harvested verbatim, info.version 1.0.11)
-  - type: Overlay
-    url: overlays/fasten-health-connect-overlay.yaml
-  - type: APIReference
-    url: https://docs.connect.fastenhealth.com/api-reference/introduction
-  - type: Authentication
-    url: https://docs.connect.fastenhealth.com/api-reference/authentication
-  - type: GettingStarted
-    url: https://docs.connect.fastenhealth.com/quickstart
-  - type: Signup
-    url: https://portal.fastenhealth.com
-    name: Fasten Connect Developer Portal
-  - type: Sandbox
-    url: https://docs.connect.fastenhealth.com/guides/test-data
-  - type: TestCredentials
-    url: https://docs.connect.fastenhealth.com/guides/test-patient-credentials
 - aid: fasten-health:fasten-connect-webhooks
   name: Fasten Connect Webhooks
-  description: Fasten Connect emits HMAC-verified webhook events to notify integrators of asynchronous
-    operations such as EHI export completion, connection lifecycle changes, and TEFCA workflow updates.
-    Documentation covers event types, delivery semantics with retries, signature verification, and a webhook
-    debugging simulator for local development.
+  description: >-
+    Fasten Connect emits HMAC-verified webhook events to notify integrators of asynchronous operations
+    such as EHI export completion, connection lifecycle changes, and TEFCA workflow updates. Documentation
+    covers event types, delivery semantics with retries, signature verification, and a webhook debugging
+    simulator for local development.
   humanURL: https://docs.connect.fastenhealth.com/webhooks/introduction
   tags:
   - Webhook
@@ -175,12 +134,13 @@ apis:
     name: Webhook Debugging Simulator
 - aid: fasten-health:fasten-stitch
   name: Fasten Stitch Client SDKs
-  description: Stitch is Fasten Connect's client-side embeddable component that lets a patient pick their
-    healthcare provider, authenticate, and grant data-sharing consent inside a host application. Stitch is shipped
-    as three SDKs — a framework-neutral Web Component, a React SDK, and a React Native SDK — each with quickstart
-    and reference docs. Client events stream connection lifecycle, error, and consent signals back to the host
-    app. The Stitch element source repos (fasten-stitch-element-react, fasten-stitch-element-react-native) are
-    MIT-licensed on GitHub with companion playground apps.
+  description: >-
+    Stitch is Fasten Connect's client-side embeddable component that lets a patient pick their healthcare
+    provider, authenticate, and grant data-sharing consent inside a host application. Stitch is shipped
+    as three SDKs — a framework-neutral Web Component, a React SDK, and a React Native SDK — each with
+    quickstart and reference docs. Client events stream connection lifecycle, error, and consent signals
+    back to the host app. The Stitch element source repos (fasten-stitch-element-react, fasten-stitch-element-react-native)
+    are MIT-licensed on GitHub with companion playground apps.
   humanURL: https://docs.connect.fastenhealth.com/stitch/v4/introduction
   tags:
   - SDK
@@ -222,10 +182,11 @@ apis:
     url: components/fasten-health-components.yml
 - aid: fasten-health:fasten-identity-proofing
   name: Fasten Identity Proofing & TEFCA IAS
-  description: Identity proofing endpoints and guides cover Fasten-issued identity verification as well as a
-    Bring Your Own Identity path for integrators that already meet NIST IAL2 / TEFCA IAS requirements.
-    Documentation includes a TEFCA Individual Access Services developer guide and patient consent + data
-    collection guidance for HIPAA-aligned implementations.
+  description: >-
+    Identity proofing endpoints and guides cover Fasten-issued identity verification as well as a Bring
+    Your Own Identity path for integrators that already meet NIST IAL2 / TEFCA IAS requirements. Documentation
+    includes a TEFCA Individual Access Services developer guide and patient consent + data collection
+    guidance for HIPAA-aligned implementations.
   humanURL: https://docs.connect.fastenhealth.com/identity-proofing/introduction
   tags:
   - Identity Proofing
@@ -252,13 +213,13 @@ apis:
   - type: Endpoint
     url: https://identity.fastenhealth.com/oauth2/par
     name: >-
-      Documented OAuth 2.0 PAR endpoint (RFC 9126). NOTE - identity.fastenhealth.com did not
-      resolve in public DNS (NXDOMAIN) when probed on 2026-08-14; recorded as documented, not
-      as independently reachable.
+      Documented OAuth 2.0 PAR endpoint (RFC 9126). NOTE - identity.fastenhealth.com did not resolve in
+      public DNS (NXDOMAIN) when probed on 2026-08-14; recorded as documented, not as independently reachable.
 - aid: fasten-health:gofhir-models
   name: gofhir-models
-  description: Apache 2.0 licensed Go client library and generated FHIR resource models used by Fasten's
-    services to parse, validate, and emit FHIR R4 payloads. Maintained as a standalone open source dependency.
+  description: >-
+    Apache 2.0 licensed Go client library and generated FHIR resource models used by Fasten's services
+    to parse, validate, and emit FHIR R4 payloads. Maintained as a standalone open source dependency.
   humanURL: https://github.com/fastenhealth/gofhir-models
   tags:
   - FHIR
@@ -273,8 +234,9 @@ apis:
     name: Apache 2.0
 - aid: fasten-health:fhir-react
   name: fhir-react
-  description: MIT-licensed React component library for rendering FHIR resources, useful for building patient
-    portals and clinical viewers on top of Fasten data.
+  description: >-
+    MIT-licensed React component library for rendering FHIR resources, useful for building patient portals
+    and clinical viewers on top of Fasten data.
   humanURL: https://github.com/fastenhealth/fhir-react
   tags:
   - FHIR
@@ -289,8 +251,9 @@ apis:
     name: MIT
 - aid: fasten-health:fasten-toolbox
   name: Fasten Toolbox
-  description: Standalone FHIR-based developer tools derived from the main Fasten platform, including catalog
-    browsing, display component previews, and other utilities for working with FHIR data.
+  description: >-
+    Standalone FHIR-based developer tools derived from the main Fasten platform, including catalog browsing,
+    display component previews, and other utilities for working with FHIR data.
   humanURL: https://github.com/fastenhealth/fasten-toolbox
   tags:
   - FHIR
@@ -301,8 +264,9 @@ apis:
     url: https://github.com/fastenhealth/fasten-toolbox
 - aid: fasten-health:folio
   name: Folio
-  description: Apache 2.0 licensed modern PDF library for Go with a layout engine, HTML-to-PDF conversion,
-    form-fill support, digital signatures, and barcode rendering. Open-sourced by Fasten to power patient-facing
+  description: >-
+    Apache 2.0 licensed modern PDF library for Go with a layout engine, HTML-to-PDF conversion, form-fill
+    support, digital signatures, and barcode rendering. Open-sourced by Fasten to power patient-facing
     medical record exports.
   humanURL: https://github.com/fastenhealth/folio
   tags:
@@ -318,8 +282,9 @@ apis:
     name: Apache 2.0
 - aid: fasten-health:fasten-connect-quickstart
   name: Fasten Connect Quickstart Sample
-  description: MIT-licensed JavaScript starter project that demonstrates an end-to-end Fasten Connect
-    integration — credential setup, Stitch embed, bulk EHI export request, and webhook-driven download.
+  description: >-
+    MIT-licensed JavaScript starter project that demonstrates an end-to-end Fasten Connect integration
+    — credential setup, Stitch embed, bulk EHI export request, and webhook-driven download.
   humanURL: https://github.com/fastenhealth/fasten-connect-quickstart
   tags:
   - Sample
@@ -334,8 +299,9 @@ apis:
     name: MIT
 - aid: fasten-health:fasten-answers-ai
   name: Fasten Answers AI
-  description: GPL-3.0 licensed Python proof-of-concept for AI-powered health insights — exploratory work on
-    conversational querying of a patient's longitudinal medical record using LLMs.
+  description: >-
+    GPL-3.0 licensed Python proof-of-concept for AI-powered health insights — exploratory work on conversational
+    querying of a patient's longitudinal medical record using LLMs.
   humanURL: https://github.com/fastenhealth/fasten-answers-ai
   tags:
   - Artificial Intelligence
@@ -348,6 +314,30 @@ apis:
   - type: License
     url: https://github.com/fastenhealth/fasten-answers-ai/blob/main/LICENSE
     name: GPL-3.0
+- aid: fasten-health:fasten-health-bridge-api
+  name: Fasten Health Bridge API
+  description: Customer (organization) facing APIs
+  humanURL: https://github.com/fastenhealth/fasten-onprem
+  baseURL: https://api.connect.fastenhealth.com/v1
+  tags:
+  - bridge
+  properties:
+  - type: OpenAPI
+    url: openapi/fasten-health-bridge-api-openapi.yml
+  - type: Documentation
+    url: https://docs.connect.fastenhealth.com/api-reference/introduction
+  - type: APIReference
+    url: https://docs.connect.fastenhealth.com/api-reference/introduction
+  - type: Authentication
+    url: https://docs.connect.fastenhealth.com/api-reference/authentication
+  - type: GettingStarted
+    url: https://docs.connect.fastenhealth.com/quickstart
+  - type: Signup
+    url: https://portal.fastenhealth.com
+  - type: Sandbox
+    url: https://docs.connect.fastenhealth.com/guides/test-data
+  - type: TestCredentials
+    url: https://docs.connect.fastenhealth.com/guides/test-patient-credentials
 common:
 - type: AgenticAccess
   url: agentic-access/fasten-health-agentic-access.yml
