@@ -19,9 +19,9 @@ edges:
   capability_id_l1: BC-2900
   capability_name: Healthcare Interoperability Operations
   confidence: 0.85
-  evidence: POST /bridge/fhir/ehi-export  Register EHI Export request; GET /bridge/org_connection/{orgConnectionId}  Get
-    Organization Connection information; POST /bridge/vault_connection/revoke  Revoke TEFCA synthetic
-    patient connections
-  reason: The surface catalogues provider organisations/portals, manages connections to them (including
-    TEFCA) and runs FHIR EHI exports — operation of health information exchange connections and FHIR endpoints
-    for patient-initiated data sharing.
+  evidence: POST /bridge/fhir/ehi-export  Register EHI Export request; POST /bridge/vault_connection/revoke  Revoke
+    TEFCA synthetic patient connections; GET /bridge/org_connection/{orgConnectionId}  Get Organization
+    Connection information
+  reason: Operations manage connections to healthcare organizations, a provider/portal catalog, TEFCA
+    connections and FHIR EHI export — i.e. operation of health information exchange connections and FHIR
+    endpoints for patient-initiated data sharing.
