@@ -353,6 +353,9 @@ apis:
   - type: TestCredentials
     url: https://docs.connect.fastenhealth.com/guides/test-patient-credentials
 common:
+- type: CapabilityMap
+  url: capabilities/fasten-health-capability-edges.yml
+  name: Fasten Health Business Capability Map
 - type: AgenticAccess
   url: agentic-access/fasten-health-agentic-access.yml
 - type: Authentication
