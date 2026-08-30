@@ -334,6 +334,8 @@ apis:
   humanURL: https://github.com/fastenhealth/fasten-onprem
   baseURL: https://api.connect.fastenhealth.com/v1
   tags:
+  - Bridge
+  tags_raw:
   - bridge
   properties:
   - type: OpenAPI
