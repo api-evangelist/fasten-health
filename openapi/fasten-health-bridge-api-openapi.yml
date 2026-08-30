@@ -1,0 +1,844 @@
+openapi: 3.2.0
+info:
+  title: Fasten Connect Bridge API
+  description: 'Useful links:
+
+    - [Fasten Connect API repository](https://github.com/fastenhealth/fasten-connect-api)
+
+    - [Fasten Connect Developer Portal](https://github.com/fastenhealth/fasten-connect-app)'
+  termsOfService: https://www.fastenhealth.com/
+  contact:
+    email: connect@fastenhealth.com
+  license:
+    name: Private
+  version: 1.0.11
+servers:
+- url: https://api.connect.fastenhealth.com/v1/
+  description: Use this server for both live and test mode.
+tags:
+- name: bridge
+  description: Customer (organization) facing APIs
+paths:
+  /bridge/catalog:
+    get:
+      tags:
+      - bridge
+      description: "Get branding & metadata information associated with healthcare institutions supported by Fasten Connect. \n\n`brand_id` OR `portal_id` is required.\n\n<Note>\nThis is used to display branding information in the Stitch.js popup widget.\nThis API not required, unless you are building a custom widget.\n</Note>\n\n<Warning>\n**Do not call this endpoint live on every request.**\n\nFasten may occasionally merge or deprecate IDs when the source EHR data changes or deletes records. To avoid broken references and improve performance:\n\n- Cache the results returned by this endpoint.\n- To check for updates, use the `org_connection_id` to call the [status endpoint](/api-reference/organization_connection/get) and retrieve the current `brand_id` and `portal_id`.\n- Then, use those values to query the catalog GET endpoint and update your cached results accordingly.\n\nFollowing this pattern ensures you always have the latest data without risking failures from deprecated IDs.\n</Warning>\n\n<Badge color=\"green\">TEFCA</Badge> If `tefca_directory_id` and `brand_id` are available, you should retrieve both. `tefca_directory_id` will provide an accurate name for the Healthcare Provider, while the `brand_id` can be used for logos and other branding information. However, if you can only retrieve one, prioritize `tefca_directory_id`.\n\nTEFCA Directory IDs are subject to change by the TEFCA governing body and may be deprecated without notice. TEFCA Directory IDs are only cached for 2 weeks, after which they are removed from the catalog."
+      parameters:
+      - name: api_mode
+        in: query
+        description: API Mode, used to filter institutions during lookup.
+        required: true
+        schema:
+          type: string
+      - name: public_id
+        in: query
+        description: Public ID for Organization credential. See Authentication for more information
+        required: true
+        schema:
+          type: string
+      - name: portal_id
+        in: query
+        description: Portal ID (required if Brand ID or TEFCA Directory ID is not set)
+        required: false
+        schema:
+          type: string
+      - name: brand_id
+        in: query
+        description: Brand ID (required if Portal ID or TEFCA Directory ID is not set)
+        required: false
+        schema:
+          type: string
+      - name: tefca_directory_id
+        in: query
+        description: TEFCA Directory ID (required if Portal ID or Brand ID is not set)
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseWrapper'
+                - type: object
+                  properties:
+                    data:
+                      type: object
+                      anyOf:
+                      - $ref: '#/components/schemas/CatalogPortal'
+                      - $ref: '#/components/schemas/CatalogBrand'
+  /bridge/catalog/export:
+    get:
+      tags:
+      - bridge
+      description: 'Download the full Fasten Connect catalog in bulk. This endpoint returns URLs for JSON files that contain all brands, portals, and endpoints that are currently available in our catalog.
+
+
+        Use this API when you need to hydrate or refresh an offline cache instead of repeatedly calling the catalog lookup endpoints.
+
+
+        <Warning>
+
+        The download URLs expire after 60 minutes. Begin downloading the files immediately after requesting them.
+
+
+        This API is rate limited and the data structure is subject to change. **Please contact support@fastenhealth.com before use.**
+
+        </Warning>'
+      responses:
+        '200':
+          description: Download URLs for each catalog file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brands.json:
+                    type: string
+                    format: uri
+                    description: Bulk metadata for every brand supported by Fasten Connect.
+                    example: https://fasten-connect-cdn-prod-1234/catalog/2024-06-28/brands.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=60&...
+                  portals.json:
+                    type: string
+                    format: uri
+                    description: Bulk metadata for every portal supported by Fasten Connect.
+                    example: https://fasten-connect-cdn-prod-1234/catalog/2024-06-28/portals.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=60&...
+                  endpoints.json:
+                    type: string
+                    format: uri
+                    description: Bulk metadata for every endpoint supported by Fasten Connect.
+                    example: https://fasten-connect-cdn-prod-1234/catalog/2024-06-28/endpoints.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=60&...
+      security:
+      - bridge_basic: []
+  /bridge/catalog/search:
+    post:
+      tags:
+      - bridge
+      description: "Search for healthcare institutions supported by Fasten Connect. \n\n<Note>\nThis is used to display branding information in the Stitch.js popup widget.\nThis API not required, unless you are building a custom widget.\n</Note>\n\n<Warning>\nThis API is rate limited and is subject to change. **Please contact support@fastenhealth.com before use.**\n</Warning>"
+      parameters:
+      - name: api_mode
+        in: query
+        description: API Mode, used to filter institutions during search.
+        required: true
+        schema:
+          type: string
+      - name: public_id
+        in: query
+        description: Public ID for Organization credential. See Authentication for more information
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Search for healthcare institution
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchAfter:
+                  type: array
+                  items:
+                    type: string
+                  description: Pagination information
+                  example:
+                  - '0.018018503'
+                  - athena
+                  - athena
+                query:
+                  type: string
+                  description: Search Query
+                  example: athena
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/LighthouseCatalogSearchResults'
+  /bridge/org:
+    get:
+      tags:
+      - bridge
+      description: Get information about your organization. This is used to display branding information in the Stitch.js popup widget.
+      parameters:
+      - name: public_id
+        in: query
+        description: Public ID for Organization credential. See Authentication for more information
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Organization'
+  /bridge/org_connection/{orgConnectionId}:
+    get:
+      tags:
+      - bridge
+      summary: Get Organization Connection information
+      description: "Check the status of an existing organization connection.\n        \n<Warning>\nThis endpoint requires an API public id & private key for authentication. Do not expose these keys in the browser.\n</Warning>\n"
+      parameters:
+      - name: orgConnectionId
+        in: path
+        description: Patient Connection Id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/OrganizationConnection'
+      security:
+      - bridge_basic: []
+  /bridge/vault_connection/revoke:
+    post:
+      tags:
+      - bridge
+      summary: Revoke TEFCA synthetic patient connections
+      description: 'Run this command to reset a TEFCA synthetic test patient''s connections.
+
+
+        <Badge color="green">TEFCA</Badge> This helper endpoint is only available while using `test` API credentials and is designed for clearing your TEFCA IAS sandbox before running another end-to-end scenario.
+
+
+        <Warning>
+
+        Authenticate with HTTP Basic auth using your organization public id and private key that are configured for **Test API Mode**. Requests made with live credentials will be rejected.
+
+        </Warning>
+
+
+        The request body **must** include an `email` value for one of the test synthetic patients documented in the [TEFCA IAS Developer Guide](/guides/tefca-ias#example-test-patients). All current connections for that synthetic patient are revoked so you can start a fresh flow.'
+      requestBody:
+        description: Identify the synthetic patient and the vault connections that should be revoked.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultConnectionOrgRevokeRequest'
+            example:
+              email: dogbeaker@aol.com
+        required: true
+      responses:
+        '200':
+          description: Revoke operation completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/VaultConnectionOrgRevokeResponse'
+      security:
+      - bridge_basic: []
+  /bridge/connect:
+    get:
+      tags:
+      - bridge
+      description: 'This endpoint will generate a state value and redirect the user to their healthcare provider Patient Portal to authenticate with the healthcare provider''s EHR.
+
+
+        On completion, Fasten Connect will redirect the user back to your redirect_uri with an `org_connection_id` and `endpoint_id` query parameter.
+
+
+        If an error occurred during the authentication process, Fasten Connect will redirect the user back with an `error` and `error_description` query parameter.
+
+
+        <Warning>
+
+        If you have configured more than one Redirect URL in the Fasten Connect Portal, you **MUST** include the `redirect_uri` query parameter in the request.
+
+        This is done automatically by the [Stitch SDK](stitch/v4/introduction) widget.
+
+        </Warning>
+
+        '
+      parameters:
+      - name: public_id
+        in: query
+        description: Public Key for Organization Credential
+        required: true
+        schema:
+          type: string
+      - name: endpoint_id
+        in: query
+        description: Catalog Endpoint Id
+        required: true
+        example: f4ea79fc-9a1b-43f0-be95-24247d666514
+        schema:
+          type: string
+      - name: brand_id
+        in: query
+        description: Catalog Brand Id
+        required: true
+        example: 5e3839ed-6ae1-472b-b4b8-b5df098443c7
+        schema:
+          type: string
+      - name: portal_id
+        in: query
+        description: Catalog Portal Id
+        required: true
+        example: d26f0b1c-82e7-4cb5-a4c4-55e73d48c016
+        schema:
+          type: string
+      - name: redirect_uri
+        in: query
+        description: Redirect URI (where the user will be redirected after authentication). Must match a `redirect_uri` provided in the Fasten Connect Portal.
+        required: true
+        example: https://www.example.com
+        schema:
+          type: string
+          format: uri
+      - name: external_id
+        in: query
+        description: An Opaque identifier, used to identify the patient in your system. This value will be returned in the Redirect URL response.
+        required: false
+        schema:
+          type: string
+      - name: external_state
+        in: query
+        description: An Opaque identifier, used to identify the connection request. This value should be unique. This value will be returned in the Redirect URL response.
+        required: false
+        schema:
+          type: string
+      responses:
+        '302':
+          description: Redirect
+          headers:
+            location:
+              description: Setup state based redirect
+              schema:
+                oneOf:
+                - type: string
+                  description: If configuration is correct and valid for endpoint, catalog, brand and public id, Fasten Connect will redirect to given redirect url
+  /bridge/reconnect:
+    get:
+      tags:
+      - bridge
+      description: "This endpoint is used to reconnect an existing patient authorization with their healthcare provider's Patient Portal. \nIt generates a state value and redirects the user to the Patient Portal for re-authentication with the provider's EHR system.\nThis endpoint is only required if the existing connection id has expired or been revoked.\n\nUpon successful completion, Fasten Connect will redirect the user back to the specified `redirect_uri` with the `org_connection_id` and `endpoint_id` query parameters.\n\nIf an error occurs during the re-authentication process, the user will be redirected back with `error` and `error_description` query parameters providing details about the failure.\n\n<Warning>\nIf multiple Redirect URLs are configured in the Fasten Connect Portal, you **MUST** include the `redirect_uri` query parameter in the request. This is automatically handled by the [Stitch SDK](stitch/v4/introduction) widget.\n</Warning>\n\n<Badge color=\"green\">TEFCA</Badge> This endpoint CANNOT be used for TEFCA connections. TEFCA connections must be reconnected via the Stitch.js widget.\n"
+      parameters:
+      - name: public_id
+        in: query
+        description: Public Key for Organization Credential
+        required: true
+        schema:
+          type: string
+      - name: redirect_uri
+        in: query
+        description: Redirect URI (where the user will be redirected after authentication). Must match a `redirect_uri` provided in the Fasten Connect Portal.
+        required: true
+        example: https://www.example.com
+        schema:
+          type: string
+          format: uri
+      - name: reconnect_org_connection_id
+        in: query
+        description: Organization connection id, used for reconnecting existing patients
+        required: true
+        schema:
+          type: string
+      - name: external_id
+        in: query
+        description: An Opaque identifier, used to identify the patient in your system. This value will be returned in the Redirect URL response.
+        required: false
+        schema:
+          type: string
+      - name: external_state
+        in: query
+        description: An Opaque identifier, used to identify the connection request. This value should be unique. This value will be returned in the Redirect URL response.
+        required: false
+        schema:
+          type: string
+      responses:
+        '302':
+          description: Redirect
+          headers:
+            location:
+              description: Setup state based redirect
+              schema:
+                oneOf:
+                - type: string
+                  description: If configuration is correct and valid for endpoint, catalog, brand and public id, Fasten Connect will redirect to given redirect url
+  /bridge/fhir/ehi-export:
+    post:
+      tags:
+      - bridge
+      summary: Register EHI Export request
+      description: "<Note>\nThis endpoint is idempotent. If a request with the same `org_connection_id` has already been registered, it will return the existing request.\n</Note>\n\nThis endpoint will register an bulk medical record export request with the Fasten Connect API for the provided `org_connection_id` (Patient id)\n\nThis functionality is similar in design to the HL7 [EHI Export](https://build.fhir.org/ig/argonautproject/ehi-api/ehi-export.html) specification.\nHowever it is designed to be a unified API for all EHRs, as many EHRs do not support the HL7 EHI Export specification.\n\n<Warning>\nThis endpoint requires an API public id & private key for authentication. Do not expose these keys in the browser.\n</Warning>\n\nThis task will run asynchronously and may take some time to complete. \nYou can check the status of the task using the [Get Request Status](/api-reference/ehi_export/get) endpoint.\n\nOn completion a webhook will be sent to your `webhook_url` with metadata about the task, and a `download_link` to download the results.\n"
+      requestBody:
+        description: Update an existent pet in the store
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                org_connection_id:
+                  type: string
+                  format: uuid
+                  description: Patient Connection Id
+                  example: 16e39045-5382-42a0-b93d-b75268984c1f
+                fixtures:
+                  type: object
+                  description: Optional testing fixtures for TEFCA API-mode exports.
+                  properties:
+                    tefca_ccda:
+                      type: string
+                      description: Force a specific synthetic CCDA response for TEFCA testing.
+                      enum:
+                      - myra-jones.xml
+                      - lennie-connell.xml
+                      - myra-jones-v2.xml
+                      - myra-jones-v7.xml
+                      - bernice-maxwell.xml
+                      example: myra-jones.xml
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/EhiExportRequestStatus'
+      security:
+      - bridge_basic: []
+  /bridge/fhir/ehi-export/{taskId}:
+    get:
+      tags:
+      - bridge
+      summary: Get EHI Export Status/Results
+      description: "Check the status of the EHI Export Task.\n\nThis is a polling endpoint intended for informational purposes only. It does not return the actual medical records or a `download_links` array. \nInstead, the `download_links` will be sent asynchronously to a customer-defined [webhook](/webhooks/introduction). \n\n<Note>\nWe use [webhooks](/webhooks/introduction) to deliver the `download_links` because they are more reliable and scalable for background job completion. \nPolling this endpoint repeatedly introduces unnecessary load and latency for your system and ours. Webhooks enable \ninstant delivery of results the moment they're ready.      \n\n**If your [webhook](/webhooks/introduction) is not configured, you will not be able to retrieve the exported EHI.**\n</Note>\n\n<Warning>\nThis endpoint requires an API public id & private key for authentication. Do not expose these keys in the browser.\n</Warning>\n"
+      parameters:
+      - name: taskId
+        in: path
+        description: Task Id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/EhiExportRequestStatus'
+      security:
+      - bridge_basic: []
+  /bridge/fhir/ehi-export/{taskId}/download/{fileId}:
+    get:
+      tags:
+      - bridge
+      summary: Download EHI-Export Task Results from S3
+      description: 'When provided with a `taskId` and `fileId`, this endpoint will return a signed URL to download the file in the `Location` header.
+
+        Your http client should be able to follow the redirect and download the file.
+
+
+        This signed URL will expire after a short period of time, so you should download the file immediately.
+
+        If you are unable to do so, you can request a new signed URL by calling this endpoint again.
+
+
+        <Warning>
+
+        This endpoint requires an API public id & private key for authentication. Do not expose these keys in the browser.
+
+        </Warning>
+
+        '
+      parameters:
+      - name: taskId
+        in: path
+        description: Task Id
+        required: true
+        schema:
+          type: string
+      - name: fileId
+        in: path
+        description: File Id to download
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 200 Response
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+                description: Signed URL to download the file
+                example: https://fasten-connect-production-files.s3.amazonaws.com/ehi-export/test/2024-04-03-098c09ef-887d-4aad-886c-d3ffd11750da.jsonl
+      security:
+      - bridge_basic: []
+  /support/request:
+    post:
+      tags:
+      - bridge
+      description: "File a support ticket with the Fasten team using our API. \n\n<Note>\nThis endpoint is in BETA and is not recommended for production use.\nWe reserve the right to remove this endpoint at any time.\n</Note>\n\n<Warning>\nThis API is rate limited and is subject to change. **Please contact support@fastenhealth.com before use.**\n</Warning>"
+      parameters:
+      - name: public_id
+        in: query
+        description: Public ID for Organization credential. See Authentication for more information
+        required: true
+        schema:
+          type: string
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+      requestBody:
+        description: Submit a support request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email address for your team. We will use this to contact you about your request.
+                  example: support@company.com
+                name:
+                  type: string
+                  description: This should be the name of the individual who is filing the support request.
+                  example: John Doe
+                subject:
+                  type: string
+                  description: A short description of the issue.
+                  example: Epic Sandbox test credentials do not work
+                body:
+                  type: string
+                  description: A details description of the issue. Include any context that may be relevant.
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+components:
+  schemas:
+    EhiExportRequestStatus:
+      type: object
+      properties:
+        task_id:
+          type: string
+          format: string
+          description: Task Id
+          example: c9c7a91b66b34fdca749bb8e9cfbf617
+        status:
+          type: string
+          enum:
+          - pending
+          - success
+          - failed
+          example: pending
+      xml:
+        name: ehi_export_request_status
+    OrganizationConnection:
+      type: object
+      properties:
+        org_connection_id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        org_id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        catalog_brand_id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        catalog_portal_id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        catalog_endpoint_id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        tefca_directory_id:
+          type: string
+          example: urn:oid:2.16.840.1.111111.3.3126.2.3.33929.5
+          description: (TEFCA) The TEFCA Network Directory ID associated with this connection, if applicable. Only available for TEFCA connections.
+        platform_type:
+          type: string
+          example: epic
+        api_mode:
+          type: string
+          description: API Mode
+          enum:
+          - live
+          - test
+        status:
+          type: string
+          description: Connection Status
+          enum:
+          - authorized
+          - revoked
+          - refreshing
+          example: authorized
+        scope:
+          type: string
+          description: FHIR Scopes granted by the patient. See https://hl7.org/fhir/smart-app-launch/scopes-and-launch-context.html
+          example: openid fhirUser offline_access patient/*.read
+        consent_expires_at:
+          type: string
+          description: (Optional) This will be an RFC3339 timestamp which will specify when the patient’s consent to share data with your application will expire.Only some EHRs will provide this information. For EHRs that do not provide this information, this field will be omitted.
+          example: '2026-01-17T00:00:00Z'
+      xml:
+        name: organization_connection
+    CatalogBrand:
+      type: object
+      description: Branding information for a healthcare institution
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        last_updated:
+          type: string
+          format: date-time
+          example: '2024-04-03T10:00:00Z'
+        name:
+          type: string
+          example: Acme Health, Inc.
+        brand_website:
+          type: string
+          format: uri
+          example: https://www.example.com/
+        aliases:
+          type: array
+          items:
+            type: string
+          example:
+          - Acme Health
+          - Acme Health, Inc.
+        description:
+          type: string
+          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
+        portal_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        brand_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+      xml:
+        name: catalogportal
+    VaultConnectionOrgRevokeResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: AWS request id associated with the revoke job.
+          example: f5d19ee8-6d53-4d17-b7f8-368d1fa41506
+        revoked:
+          type: array
+          description: The vault connection ids that were successfully revoked.
+          items:
+            type: string
+          example:
+          - vault_conn_12345
+      xml:
+        name: vault_connection_org_revoke_response
+    LighthouseCatalogSearchResults:
+      type: object
+      properties:
+        hits:
+          type: object
+          properties:
+            total:
+              type: object
+              properties:
+                value:
+                  type: integer
+                  example: 1
+            hits:
+              type: array
+              items:
+                type: object
+                properties:
+                  _type:
+                    type: string
+                    example: _doc
+                  _id:
+                    type: string
+                    example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+                  _score:
+                    type: number
+                    example: 1.0
+                  sort:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - 0.018018503
+                    - athena
+                    - athena
+                  _source:
+                    type: object
+                    allOf:
+                    - $ref: '#/components/schemas/CatalogBrand'
+                    - type: object
+                      properties:
+                        sort_name:
+                          type: string
+                          example: brand
+                        hidden:
+                          type: boolean
+                          example: false
+                        platform_type:
+                          type: string
+                          example: epic
+      xml:
+        name: lighthousecatalogsearch
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        name:
+          type: string
+          example: Example Inc.
+        logo_uri:
+          type: string
+          example: https://www.example.com/logo.png
+        privacy_policy_uri:
+          type: string
+          format: uri
+          example: https://www.example.com/privacy_policy
+        website_uri:
+          type: string
+          format: uri
+          example: https://www.example.com
+        plan:
+          type: string
+          example: free
+        status:
+          type: string
+          description: Organization Status
+          enum:
+          - active
+          - inactive
+          example: active
+      xml:
+        name: organization
+    CatalogPortal:
+      type: object
+      description: Patient Portal information for a healthcare institution
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        last_updated:
+          type: string
+          format: date-time
+          example: '2024-04-03T10:00:00Z'
+        name:
+          type: string
+          example: Acme Health, Inc.
+        portal_website:
+          type: string
+          format: uri
+          example: https://www.example.com/privacy_policy
+        description:
+          type: string
+          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
+        endpoint_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+      xml:
+        name: catalogportal
+    ResponseWrapper:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        error:
+          type: string
+          example: ''
+      xml:
+        name: responseWrapper
+    VaultConnectionOrgRevokeRequest:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address for one of the synthetic TEFCA IAS test patients listed in the [TEFCA IAS Developer Guide](/guides/tefca-ias#example-test-patients).
+          example: dogbeaker@aol.com
+      xml:
+        name: vault_connection_org_revoke_request
+  securitySchemes:
+    bridge_basic:
+      type: http
+      scheme: basic
+      description: '[Basic Authentication](/api-reference/authentication), containing API Public Id and Private Key generated from the Fasten Connect Portal. **Do not expose these keys in the browser.**
+
+        '
+externalDocs:
+  description: Find out more about Fasten Connect
+  url: https://www.fastenhealth.com/
