@@ -474,6 +474,8 @@ common:
   url: asyncapi/fasten-health-webhooks.yml
 - type: Overlay
   url: overlays/fasten-health-connect-overlay.yaml
+- type: Contact
+  url: mailto:support@fastenhealth.com
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
