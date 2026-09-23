@@ -1,0 +1,20 @@
+{
+  "provider": "fasten-health",
+  "sources": [
+    "_original/fasten-health-connect-openapi-original.yml"
+  ],
+  "outputs": [
+    "fasten-health-bridge-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "fasten-health-connect-openapi-original.yml: upgraded openapi 3.0.1 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "fasten-health-bridge-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}
