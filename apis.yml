@@ -48,9 +48,10 @@ tags:
 - EHI Export
 - Patient Consent
 - Self-Hosted
-- Open-Source
+- Open Source
 - HL7
 - Healthcare Connectivity
+- A2A
 tags_raw:
 - Healthcare
 - FHIR
@@ -64,6 +65,8 @@ tags_raw:
 - Open Source
 - HL7
 - Healthcare Connectivity
+- Open-Source
+- A2A
 created: '2026-05-25'
 modified: '2026-08-14'
 url: https://raw.githubusercontent.com/api-evangelist/fasten-health/refs/heads/main/apis.yml
@@ -90,7 +93,7 @@ apis:
   - Self-Hosted
   - FHIR
   - Family Health
-  - Open-Source
+  - Open Source
   tags_raw:
   - Personal Health Record
   - Electronic Medical Record
@@ -98,6 +101,7 @@ apis:
   - FHIR
   - Family Health
   - Open Source
+  - Open-Source
   properties:
   - type: SourceCode
     url: https://github.com/fastenhealth/fasten-onprem
@@ -484,3 +488,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 25
   pass: local-v1
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://docs.connect.fastenhealth.com/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.3"
+  control: 404
