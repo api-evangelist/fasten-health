@@ -727,53 +727,6 @@ components:
           - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
       xml:
         name: catalogportal
-    CatalogPortal:
-      type: object
-      description: Patient Portal information for a healthcare institution
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-        last_updated:
-          type: string
-          format: date-time
-          example: '2024-04-03T10:00:00Z'
-        name:
-          type: string
-          example: Acme Health, Inc.
-        portal_website:
-          type: string
-          format: uri
-          example: https://www.example.com/privacy_policy
-        description:
-          type: string
-          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
-        endpoint_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-      xml:
-        name: catalogportal
-    VaultConnectionOrgRevokeResponse:
-      type: object
-      properties:
-        request_id:
-          type: string
-          description: AWS request id associated with the revoke job.
-          example: f5d19ee8-6d53-4d17-b7f8-368d1fa41506
-        revoked:
-          type: array
-          description: The vault connection ids that were successfully revoked.
-          items:
-            type: string
-          example:
-          - vault_conn_12345
-      xml:
-        name: vault_connection_org_revoke_response
     LighthouseCatalogSearchResults:
       type: object
       properties:
@@ -890,6 +843,65 @@ components:
           example: '2026-01-17T00:00:00Z'
       xml:
         name: organization_connection
+    VaultConnectionOrgRevokeResponse:
+      type: object
+      properties:
+        request_id:
+          type: string
+          description: AWS request id associated with the revoke job.
+          example: f5d19ee8-6d53-4d17-b7f8-368d1fa41506
+        revoked:
+          type: array
+          description: The vault connection ids that were successfully revoked.
+          items:
+            type: string
+          example:
+          - vault_conn_12345
+      xml:
+        name: vault_connection_org_revoke_response
+    CatalogPortal:
+      type: object
+      description: Patient Portal information for a healthcare institution
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        last_updated:
+          type: string
+          format: date-time
+          example: '2024-04-03T10:00:00Z'
+        name:
+          type: string
+          example: Acme Health, Inc.
+        portal_website:
+          type: string
+          format: uri
+          example: https://www.example.com/privacy_policy
+        description:
+          type: string
+          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
+        endpoint_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+      xml:
+        name: catalogportal
+    VaultConnectionOrgRevokeRequest:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address for one of the synthetic TEFCA IAS test patients listed in the [TEFCA IAS Developer Guide](/guides/tefca-ias#example-test-patients).
+          example: dogbeaker@aol.com
+      xml:
+        name: vault_connection_org_revoke_request
     Organization:
       type: object
       properties:
@@ -940,18 +952,6 @@ components:
           example: pending
       xml:
         name: ehi_export_request_status
-    VaultConnectionOrgRevokeRequest:
-      type: object
-      required:
-      - email
-      properties:
-        email:
-          type: string
-          format: email
-          description: Email address for one of the synthetic TEFCA IAS test patients listed in the [TEFCA IAS Developer Guide](/guides/tefca-ias#example-test-patients).
-          example: dogbeaker@aol.com
-      xml:
-        name: vault_connection_org_revoke_request
   securitySchemes:
     bridge_basic:
       type: http
