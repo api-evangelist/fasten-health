@@ -38,6 +38,9 @@ accessModel:
 position: Producing
 access: Open Source
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/fasten-health.png
+x-docs-platform: mintlify
+x-docs-platform-confidence: medium
+x-docs-platform-checked: 2026-10-03
 tags:
 - Healthcare
 - FHIR
