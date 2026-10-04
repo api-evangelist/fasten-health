@@ -682,51 +682,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    CatalogBrand:
-      type: object
-      description: Branding information for a healthcare institution
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-        last_updated:
-          type: string
-          format: date-time
-          example: '2024-04-03T10:00:00Z'
-        name:
-          type: string
-          example: Acme Health, Inc.
-        brand_website:
-          type: string
-          format: uri
-          example: https://www.example.com/
-        aliases:
-          type: array
-          items:
-            type: string
-          example:
-          - Acme Health
-          - Acme Health, Inc.
-        description:
-          type: string
-          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
-        portal_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-        brand_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-      xml:
-        name: catalogportal
     LighthouseCatalogSearchResults:
       type: object
       properties:
@@ -778,6 +733,70 @@ components:
                           example: epic
       xml:
         name: lighthousecatalogsearch
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        name:
+          type: string
+          example: Example Inc.
+        logo_uri:
+          type: string
+          example: https://www.example.com/logo.png
+        privacy_policy_uri:
+          type: string
+          format: uri
+          example: https://www.example.com/privacy_policy
+        website_uri:
+          type: string
+          format: uri
+          example: https://www.example.com
+        plan:
+          type: string
+          example: free
+        status:
+          type: string
+          description: Organization Status
+          enum:
+          - active
+          - inactive
+          example: active
+      xml:
+        name: organization
+    CatalogPortal:
+      type: object
+      description: Patient Portal information for a healthcare institution
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        last_updated:
+          type: string
+          format: date-time
+          example: '2024-04-03T10:00:00Z'
+        name:
+          type: string
+          example: Acme Health, Inc.
+        portal_website:
+          type: string
+          format: uri
+          example: https://www.example.com/privacy_policy
+        description:
+          type: string
+          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
+        endpoint_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+      xml:
+        name: catalogportal
     ResponseWrapper:
       type: object
       properties:
@@ -789,6 +808,23 @@ components:
           example: ''
       xml:
         name: responseWrapper
+    EhiExportRequestStatus:
+      type: object
+      properties:
+        task_id:
+          type: string
+          format: string
+          description: Task Id
+          example: c9c7a91b66b34fdca749bb8e9cfbf617
+        status:
+          type: string
+          enum:
+          - pending
+          - success
+          - failed
+          example: pending
+      xml:
+        name: ehi_export_request_status
     OrganizationConnection:
       type: object
       properties:
@@ -859,37 +895,6 @@ components:
           - vault_conn_12345
       xml:
         name: vault_connection_org_revoke_response
-    CatalogPortal:
-      type: object
-      description: Patient Portal information for a healthcare institution
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-        last_updated:
-          type: string
-          format: date-time
-          example: '2024-04-03T10:00:00Z'
-        name:
-          type: string
-          example: Acme Health, Inc.
-        portal_website:
-          type: string
-          format: uri
-          example: https://www.example.com/privacy_policy
-        description:
-          type: string
-          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
-        endpoint_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
-      xml:
-        name: catalogportal
     VaultConnectionOrgRevokeRequest:
       type: object
       required:
@@ -902,56 +907,51 @@ components:
           example: dogbeaker@aol.com
       xml:
         name: vault_connection_org_revoke_request
-    Organization:
+    CatalogBrand:
       type: object
+      description: Branding information for a healthcare institution
       properties:
         id:
           type: string
           format: uuid
           example: 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        last_updated:
+          type: string
+          format: date-time
+          example: '2024-04-03T10:00:00Z'
         name:
           type: string
-          example: Example Inc.
-        logo_uri:
-          type: string
-          example: https://www.example.com/logo.png
-        privacy_policy_uri:
+          example: Acme Health, Inc.
+        brand_website:
           type: string
           format: uri
-          example: https://www.example.com/privacy_policy
-        website_uri:
+          example: https://www.example.com/
+        aliases:
+          type: array
+          items:
+            type: string
+          example:
+          - Acme Health
+          - Acme Health, Inc.
+        description:
           type: string
-          format: uri
-          example: https://www.example.com
-        plan:
-          type: string
-          example: free
-        status:
-          type: string
-          description: Organization Status
-          enum:
-          - active
-          - inactive
-          example: active
+          example: Acme Health, Inc. is a leading provider of healthcare services in the United States.
+        portal_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
+        brand_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+          - 8d4136dd-31b6-4a65-88a0-7ea22a2b16d6
       xml:
-        name: organization
-    EhiExportRequestStatus:
-      type: object
-      properties:
-        task_id:
-          type: string
-          format: string
-          description: Task Id
-          example: c9c7a91b66b34fdca749bb8e9cfbf617
-        status:
-          type: string
-          enum:
-          - pending
-          - success
-          - failed
-          example: pending
-      xml:
-        name: ehi_export_request_status
+        name: catalogportal
   securitySchemes:
     bridge_basic:
       type: http
