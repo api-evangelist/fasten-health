@@ -1,0 +1,106 @@
+edges:
+- partner_name: Go module proxy
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official SDK (Go)
+  evidence: https://pkg.go.dev/github.com/fastenhealth/fasten-onprem
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/fastenhealth/fasten-onprem
+      version: v1.1.3
+      released: '2024-10-01'
+      released_field: Time
+      lapsed: true
+      page: https://pkg.go.dev/github.com/fastenhealth/fasten-onprem
+      repo_leg: github-org:fastenhealth
+      publisher_leg: org:fastenhealth
+      matched_by: github-org
+    - name: github.com/fastenhealth/folio
+      version: v0.0.0-20260503191122-f9831e9bbb48
+      released: '2026-05-03'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/fastenhealth/folio
+      repo_leg: github-org:fastenhealth
+      publisher_leg: org:fastenhealth
+      matched_by: github-org
+    - name: github.com/fastenhealth/gofhir-models
+      version: v0.1.1
+      released: '2026-06-18'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/fastenhealth/gofhir-models
+      repo_leg: github-org:fastenhealth
+      publisher_leg: org:fastenhealth
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@fastenhealth/fasten-stitch-element-react
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@fastenhealth/fasten-stitch-element-react'
+      version: 1.0.4
+      released: '2026-08-31'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@fastenhealth/fasten-stitch-element-react
+      repo_leg: github-org:fastenhealth
+      publisher_leg: org:fastenhealth
+      matched_by: github-org
+    - name: '@fastenhealth/fasten-stitch-element-react-native'
+      version: 1.0.6
+      released: '2026-08-31'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@fastenhealth/fasten-stitch-element-react-native
+      repo_leg: github-org:fastenhealth
+      publisher_leg: org:fastenhealth
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+generated: '2026-10-18'
+method: searched
+source:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
+checked:
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
