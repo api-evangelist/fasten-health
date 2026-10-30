@@ -64,43 +64,152 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Fasten Health is a healthcare data interoperability company offering a unified medical record platform that gives patients and developers access to clinical data across the U.S. healthcare system. Fasten began as an open source project — **Fasten OnPrem**, a self-hosted personal/family electronic medical record manager (GPL-3.0, 2.7k+ stars) that ingests FHIR Bundles and runs in Docker on a user's own infrastructure. The team has since productized the connectivity layer as **Fasten Connect**, a commercial REST + FHIR API and Stitch client SDK suite that retrieves patient clinical records from 50,000+ U.S. healthcare systems and 60,000+ organizations including Epic, Cerner, MyChart, Kaiser Permanente, HCA, Ascension, Humana, and Medicare.
+Fasten Health is a healthcare data interoperability company offering a unified medical record platform that gives patients and developers access to clinical data across the U.S. healthcare system. Fasten began as an open-source project — Fasten OnPrem, a self-hosted personal/family electronic medical record manager that ingests FHIR Bundles and is distributed under GPL-3.0 with 2.7k+ GitHub stars. The team then productized the connectivity layer as Fasten Connect, a commercial REST + FHIR API and Stitch client SDK suite that lets developers retrieve clinical records from 50,000+ healthcare systems and 60,000+ organizations including Epic, Cerner, MyChart, Kaiser Permanente, HCA, Ascension, Humana, and Medicare. Founded by engineers who lived through the fragmentation of health data firsthand and based in New York City, Fasten ships GPL/MIT/Apache 2.0 open source repos alongside the hosted Fasten Connect platform.
 
-Fasten is based in New York City and was founded by engineers who lived through the fragmentation of health data firsthand. The Fasten Connect platform exposes catalog discovery, patient connection orchestration, organization-connection status, bulk EHI (Electronic Health Information) export, TEFCA Individual Access Services workflows, webhook-driven async notifications, and embeddable Stitch UI components for Web, React, and React Native.
+**Areas:** Healthcare · FHIR · Personal Health Record · Electronic Medical Record · Health Data Interoperability · TEFCA · EHI Export · Patient Consent · Self-Hosted · Open Source · HL7 · Healthcare Connectivity
 
-## APIs
+## Fasten Health on APIs.io
 
-| Name | Description |
-| --- | --- |
-| [Fasten OnPrem](https://github.com/fastenhealth/fasten-onprem) | Open-source, self-hosted personal/family electronic medical record manager. Go + TypeScript, GPL-3.0, runs in Docker, ingests FHIR Bundles. |
-| [Fasten Connect API](https://docs.connect.fastenhealth.com/api-reference/introduction) | Commercial REST + FHIR API (OpenAPI 1.0.11) for retrieving clinical records from 50,000+ healthcare systems. Catalog, organization connection, EHI export, TEFCA. |
-| [Fasten Connect Webhooks](https://docs.connect.fastenhealth.com/webhooks/introduction) | HMAC-verified webhook events for async export completion, connection lifecycle, and TEFCA workflow updates. |
-| [Fasten Stitch Client SDKs](https://docs.connect.fastenhealth.com/stitch/v4/introduction) | Embeddable patient-authentication and consent component shipped as a framework-neutral Web Component, React SDK, and React Native SDK. |
-| [Fasten Identity Proofing & TEFCA IAS](https://docs.connect.fastenhealth.com/identity-proofing/introduction) | NIST IAL2 identity proofing with Bring Your Own Identity, plus a TEFCA Individual Access Services developer guide. |
-| [gofhir-models](https://github.com/fastenhealth/gofhir-models) | Apache 2.0 Go client library and generated FHIR R4 resource models. |
-| [fhir-react](https://github.com/fastenhealth/fhir-react) | MIT React component library for rendering FHIR resources. |
-| [Fasten Toolbox](https://github.com/fastenhealth/fasten-toolbox) | Standalone FHIR-based developer tools derived from the main platform. |
-| [Folio](https://github.com/fastenhealth/folio) | Apache 2.0 modern Go PDF library: layout engine, HTML to PDF, forms, signatures, barcodes. |
-| [Fasten Connect Quickstart](https://github.com/fastenhealth/fasten-connect-quickstart) | MIT JavaScript starter showing an end-to-end Fasten Connect integration. |
-| [Fasten Answers AI](https://github.com/fastenhealth/fasten-answers-ai) | GPL-3.0 Python proof-of-concept for AI-powered health insights over a longitudinal medical record. |
+Everything profiled for Fasten Health is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/fasten-health/](https://apis.io/providers/fasten-health/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (11)
 
-Healthcare, FHIR, Personal Health Record, Electronic Medical Record, Health Data Interoperability, TEFCA, EHI Export, Patient Consent, Self-Hosted, Open Source, HL7, Healthcare Connectivity
+- [Fasten OnPrem](https://apis.io/apis/fasten-health/fasten-onprem/) — Fasten OnPrem is an open-source, self-hosted, personal and family electronic medical record manager written in Go (47%) and TypeScript (35%). It runs as a…
+- [Fasten Connect Webhooks](https://apis.io/apis/fasten-health/fasten-connect-webhooks/) — Fasten Connect emits HMAC-verified webhook events to notify integrators of asynchronous operations such as EHI export completion, connection lifecycle…
+- [Fasten Stitch Client SDKs](https://apis.io/apis/fasten-health/fasten-stitch/) — Stitch is Fasten Connect's client-side embeddable component that lets a patient pick their healthcare provider, authenticate, and grant data-sharing consent…
+- [Fasten Identity Proofing & TEFCA IAS](https://apis.io/apis/fasten-health/fasten-identity-proofing/) — Identity proofing endpoints and guides cover Fasten-issued identity verification as well as a Bring Your Own Identity path for integrators that already meet…
+- [gofhir-models](https://apis.io/apis/fasten-health/gofhir-models/) — Apache 2.0 licensed Go client library and generated FHIR resource models used by Fasten's services to parse, validate, and emit FHIR R4 payloads. Maintained…
+- [fhir-react](https://apis.io/apis/fasten-health/fhir-react/) — MIT-licensed React component library for rendering FHIR resources, useful for building patient portals and clinical viewers on top of Fasten data.
+- [Fasten Toolbox](https://apis.io/apis/fasten-health/fasten-toolbox/) — Standalone FHIR-based developer tools derived from the main Fasten platform, including catalog browsing, display component previews, and other utilities for…
+- [Folio](https://apis.io/apis/fasten-health/folio/) — Apache 2.0 licensed modern PDF library for Go with a layout engine, HTML-to-PDF conversion, form-fill support, digital signatures, and barcode rendering.…
+- [Fasten Connect Quickstart Sample](https://apis.io/apis/fasten-health/fasten-connect-quickstart/) — MIT-licensed JavaScript starter project that demonstrates an end-to-end Fasten Connect integration — credential setup, Stitch embed, bulk EHI export…
+- [Fasten Answers AI](https://apis.io/apis/fasten-health/fasten-answers-ai/) — GPL-3.0 licensed Python proof-of-concept for AI-powered health insights — exploratory work on conversational querying of a patient's longitudinal medical…
+- [Fasten Health Bridge API](https://apis.io/apis/fasten-health/fasten-health-bridge-api/) — Customer (organization) facing APIs
 
-## Common Resources
+### Published properties
 
-- Website: <https://www.fastenhealth.com>
-- Documentation: <https://docs.connect.fastenhealth.com>
-- GitHub Organization: <https://github.com/fastenhealth>
-- Blog: <https://blog.fastenhealth.com>
-- Developer Portal / Sign Up: <https://portal.connect.fastenhealth.com>
-- Changelog: <https://docs.connect.fastenhealth.com/changelog>
-- FAQ: <https://docs.connect.fastenhealth.com/faqs>
-- Support: <https://docs.connect.fastenhealth.com/support>
-- Container Image: `ghcr.io/fastenhealth/fasten-onprem`
-- License: GPL-3.0 (Fasten OnPrem); MIT / Apache 2.0 for SDKs and libraries
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## Maintainers
+#### AsyncAPI (1)
 
-- Kin Lane &lt;kin@apievangelist.com&gt;
+Event-driven and webhook contracts.
+
+- [Fasten Health Webhooks](https://apis.io/asyncapis/fasten-health/fasten-health-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [fasten-connect](https://apis.io/servers/fasten-health/fasten-connect/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Fasten Health Agentic Access](https://apis.io/agentic-access/fasten-health/fasten-health-agentic-access/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Fasten Health Connect Overlay](https://apis.io/overlays/fasten-health/fasten-health-connect-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Fasten Health Authentication](https://apis.io/security/fasten-health/fasten-health-authentication/)
+- [Fasten Health Domain Security](https://apis.io/security/fasten-health/fasten-health-domain-security/)
+- [Fasten Health Trust Center](https://apis.io/security/fasten-health/fasten-health-trust-center/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Fasten Health Scopes](https://apis.io/scopes/fasten-health/fasten-health-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Fasten Health Plans Pricing](https://apis.io/plans/fasten-health/fasten-health-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Fasten Health Rate Limits](https://apis.io/rate-limits/fasten-health/fasten-health-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.fastenhealth.com)
+- [Documentation](https://docs.connect.fastenhealth.com)
+- [Getting started](https://docs.connect.fastenhealth.com/quickstart)
+- [API reference](https://docs.connect.fastenhealth.com/api-reference/introduction)
+- [Pricing](https://www.fastenhealth.com)
+- [Sign up](https://portal.fastenhealth.com)
+- [Support](https://docs.connect.fastenhealth.com/support)
+- [Changelog](https://docs.connect.fastenhealth.com/changelog)
+- [Blog](https://blog.fastenhealth.com)
+- [Compliance](https://trust.fastenhealth.com/)
+- [Terms of service](https://policy.fastenhealth.com/terms.html)
+- [Privacy policy](https://policy.fastenhealth.com/connect/privacy_policy.html)
+- [GitHub](https://github.com/fastenhealth)
+- [Status](https://status.fastenhealth.com/)
+
+## API Evangelist rating
+
+**Kin Score 56.1** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 64.3 |
+| Contract quality | 58.9 |
+| Contract governance | 18.2 |
+| Operational transparency | 42.1 |
+| Developer ergonomics | 78.6 |
+| Access clarity | 39.5 |
+
+**Agent readiness 40.1** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 41.4** — Health
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/fasten-health/](https://apis.io/providers/fasten-health/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Fasten Health: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/fasten-health/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
